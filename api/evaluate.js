@@ -6,12 +6,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing idea in request body" });
     }
 
-    if (!process.env.HF_API_TOKEN) {
-      return res.status(500).json({ error: "HF_API_TOKEN env var is not set" });
-    }
-
-    if (!process.env.HF_MODEL) {
-      return res.status(500).json({ error: "HF_MODEL env var is not set" });
+    if (!process.env.GROQ_API_KEY) {
+      return res.status(500).json({ error: "GROQ_API_KEY env var is not set" });
     }
 
     const systemPrompt = `You are a strict startup idea evaluator.
@@ -34,16 +30,16 @@ Return EXACTLY this structure:
   "verdict": "string"
 }`;
 
-    const hfResponse = await fetch(
-      "https://router.huggingface.co/v1/chat/completions",
+    const groqResponse = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.HF_API_TOKEN}`,
+          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: process.env.HF_MODEL,
+          model: "llama-3.1-8b-instant",
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: `Evaluate this startup idea: ${idea}` }
@@ -54,27 +50,22 @@ Return EXACTLY this structure:
       }
     );
 
-    const data = await hfResponse.json();
+    const data = await groqResponse.json();
 
-    // Surface HF errors clearly instead of swallowing them
-    if (!hfResponse.ok) {
-      console.error("HF API error:", hfResponse.status, JSON.stringify(data));
+    if (!groqResponse.ok) {
+      console.error("Groq API error:", groqResponse.status, JSON.stringify(data));
       return res.status(500).json({
-        error: `HF API returned ${hfResponse.status}: ${data?.error?.message || data?.error || JSON.stringify(data)}`
+        error: `Groq API returned ${groqResponse.status}: ${data?.error?.message || JSON.stringify(data)}`
       });
     }
 
     const output = data?.choices?.[0]?.message?.content;
 
     if (!output) {
-      console.error("No content in HF response:", JSON.stringify(data));
-      return res.status(500).json({
-        error: "No model output",
-        debug: data  // sends full HF response to client so you can see it
-      });
+      console.error("No content in Groq response:", JSON.stringify(data));
+      return res.status(500).json({ error: "No model output", debug: data });
     }
 
-    // Extract JSON safely — handles any text before/after the object
     const start = output.indexOf("{");
     const end = output.lastIndexOf("}");
 
@@ -89,8 +80,6 @@ Return EXACTLY this structure:
 
   } catch (err) {
     console.error("evaluate handler error:", err);
-    res.status(500).json({
-      error: err.message || "Server error"
-    });
+    res.status(500).json({ error: err.message || "Server error" });
   }
 }
