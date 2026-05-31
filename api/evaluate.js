@@ -2,13 +2,24 @@ export default async function handler(req, res) {
   try {
     const { idea } = req.body;
 
-    const systemPrompt = `
-You are a strict startup idea evaluator.
-Return ONLY valid JSON.
+    if (!idea) {
+      return res.status(400).json({ error: "Missing idea in request body" });
+    }
 
-Schema:
+    if (!process.env.HF_API_TOKEN) {
+      return res.status(500).json({ error: "HF_API_TOKEN env var is not set" });
+    }
+
+    if (!process.env.HF_MODEL) {
+      return res.status(500).json({ error: "HF_MODEL env var is not set" });
+    }
+
+    const systemPrompt = `You are a strict startup idea evaluator.
+Return ONLY valid JSON — no explanation, no markdown, no backticks.
+
+Return EXACTLY this structure:
 {
-  "idea_summary": string,
+  "idea_summary": "string",
   "scores": {
     "market_demand": number,
     "competition": number,
@@ -16,15 +27,14 @@ Schema:
     "technical_feasibility": number,
     "go_to_market_difficulty": number
   },
-  "strengths": string[],
-  "risks": string[],
-  "opportunities": string[],
-  "validation_steps": string[],
-  "verdict": string
-}
-`;
+  "strengths": ["string", "string", "string"],
+  "risks": ["string", "string", "string"],
+  "opportunities": ["string", "string", "string"],
+  "validation_steps": ["string", "string", "string"],
+  "verdict": "string"
+}`;
 
-    const response = await fetch(
+    const hfResponse = await fetch(
       "https://router.huggingface.co/v1/chat/completions",
       {
         method: "POST",
@@ -36,7 +46,7 @@ Schema:
           model: process.env.HF_MODEL,
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: idea }
+            { role: "user", content: `Evaluate this startup idea: ${idea}` }
           ],
           temperature: 0.2,
           max_tokens: 900
@@ -44,23 +54,41 @@ Schema:
       }
     );
 
-    const data = await response.json();
+    const data = await hfResponse.json();
+
+    // Surface HF errors clearly instead of swallowing them
+    if (!hfResponse.ok) {
+      console.error("HF API error:", hfResponse.status, JSON.stringify(data));
+      return res.status(500).json({
+        error: `HF API returned ${hfResponse.status}: ${data?.error?.message || data?.error || JSON.stringify(data)}`
+      });
+    }
 
     const output = data?.choices?.[0]?.message?.content;
 
     if (!output) {
-      return res.status(500).json({ error: "No model output" });
+      console.error("No content in HF response:", JSON.stringify(data));
+      return res.status(500).json({
+        error: "No model output",
+        debug: data  // sends full HF response to client so you can see it
+      });
     }
 
-    // extract JSON safely
+    // Extract JSON safely — handles any text before/after the object
     const start = output.indexOf("{");
     const end = output.lastIndexOf("}");
+
+    if (start === -1 || end === -1) {
+      console.error("No JSON found in output:", output);
+      return res.status(500).json({ error: "Model did not return valid JSON", raw: output });
+    }
 
     const json = JSON.parse(output.slice(start, end + 1));
 
     res.status(200).json(json);
 
   } catch (err) {
+    console.error("evaluate handler error:", err);
     res.status(500).json({
       error: err.message || "Server error"
     });
