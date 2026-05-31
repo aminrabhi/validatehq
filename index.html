@@ -35,7 +35,6 @@
 
   #app { width: 100%; }
 
-  /* LANDING / INPUT */
   .landing {
     padding: 3rem 2rem 4rem;
     max-width: 680px;
@@ -159,7 +158,6 @@
   .trust-item { font-size: 12px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; }
   .trust-dot { width: 4px; height: 4px; background: var(--green); border-radius: 50%; }
 
-  /* LOADING */
   .loading-state {
     padding: 5rem 2rem;
     text-align: center;
@@ -182,7 +180,6 @@
   }
   .loading-sub { font-size: 13px; color: var(--text-muted); }
 
-  /* REPORT */
   .report {
     max-width: 680px;
     margin: 0 auto;
@@ -230,7 +227,6 @@
   }
   .print-btn:hover { background: var(--accent-hover); }
 
-  /* Score hero */
   .score-hero {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -273,7 +269,6 @@
   }
   .score-summary { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
 
-  /* Rubric */
   .section { margin-bottom: 1.25rem; }
   .section-title {
     font-size: 10px;
@@ -310,7 +305,6 @@
     font-size: 13px; font-weight: 500;
   }
 
-  /* Insights grid */
   .insights-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
   @media (max-width: 540px) { .insights-grid { grid-template-columns: 1fr; } }
 
@@ -345,7 +339,6 @@
   }
   .insight-list li:last-child { border-bottom: none; }
 
-  /* Validation steps */
   .steps-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -371,7 +364,6 @@
   }
   .step-text { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
 
-  /* Error */
   .error-box {
     background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;
     padding: 1rem 1.25rem; font-size: 13.5px; color: #A32D2D; margin-bottom: 1rem;
@@ -387,6 +379,11 @@
 <div id="app"></div>
 
 <script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const HF_API_TOKEN = "YOUR_HF_TOKEN_HERE"; // ← paste your Hugging Face token
+const HF_MODEL     = "mistralai/Mistral-7B-Instruct-v0.3"; // swap model if needed
+// ─────────────────────────────────────────────────────────────────────────────
+
 const HINTS = [
   "An AI tutor for adult learners returning to education",
   "A subscription box for rare, single-origin spices",
@@ -595,84 +592,102 @@ function bindEvents() {
   if (back) back.addEventListener("click", () => { state.view = "input"; state.result = null; state.error = null; render(); });
 }
 
+// Extracts the first valid JSON object from a string (handles text before/after)
+function extractJSON(text) {
+  const start = text.indexOf("{");
+  const end   = text.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("No JSON found");
+  return JSON.parse(text.slice(start, end + 1));
+}
+
 async function runEval(idea) {
   state.view = "loading";
   state.error = null;
   render();
 
-  const systemPrompt = `You are NOT a chatbot. You are a strict startup idea evaluation engine used inside a product called ValidateHQ.
+  // Mistral instruct format: [INST] system + user [/INST]
+  const prompt = `<s>[INST] You are a strict startup idea evaluation engine. You must output ONLY valid JSON — no explanation, no markdown, no backticks.
 
-Your job is to evaluate startup ideas consistently using a fixed rubric and return ONLY valid JSON.
-
-RULES (must follow exactly):
-- Do NOT chat with the user.
-- Do NOT add explanations outside JSON.
-- Do NOT include markdown or backticks.
-- Output ONLY valid JSON.
-- Be strict, analytical, and conservative.
-- Assume most startup ideas fail.
-- Avoid hype or encouragement unless supported by strong reasoning.
-- If information is unclear, assume lower confidence and lower scores.
-
-SCORING GUIDE (0-10):
-0-3 = weak / not viable / unclear demand
-4-6 = average / uncertain / requires validation
-7-8 = strong / viable with competition or effort
-9-10 = exceptional / rare / clear market pull
-
-RUBRIC (always evaluate every category):
+Evaluate the startup idea using this rubric (score each 0-10):
 - market_demand
 - competition
 - revenue_potential
 - technical_feasibility
 - go_to_market_difficulty
 
-OUTPUT FORMAT (STRICT JSON ONLY):
+Return EXACTLY this JSON structure:
 {
-  "idea_summary": "string (1-2 sentences describing the idea clearly)",
+  "idea_summary": "1-2 sentence description of the idea",
   "scores": {
-    "market_demand": number,
-    "competition": number,
-    "revenue_potential": number,
-    "technical_feasibility": number,
-    "go_to_market_difficulty": number
+    "market_demand": <number 0-10>,
+    "competition": <number 0-10>,
+    "revenue_potential": <number 0-10>,
+    "technical_feasibility": <number 0-10>,
+    "go_to_market_difficulty": <number 0-10>
   },
-  "overall_score": number,
+  "overall_score": <number 0-100>,
   "strengths": ["string", "string", "string"],
   "risks": ["string", "string", "string"],
   "opportunities": ["string", "string", "string"],
   "validation_steps": ["string", "string", "string"],
-  "verdict": "string (one sentence only, neutral tone)"
+  "verdict": "One neutral sentence summarizing the idea's viability."
 }
 
-OVERALL SCORE RULE:
-overall_score = clamp((market_demand + revenue_potential + technical_feasibility - competition - go_to_market_difficulty) * 2, 0, 100)`;
+Startup idea to evaluate: ${idea} [/INST]`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: "user", content: `Evaluate this startup idea: ${idea}` }]
-      })
-    });
+    // HF will return 503 if the model is loading — retry up to 3 times
+    let response, data;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      response = await fetch(
+        `https://api-inference.huggingface.co/models/${HF_MODEL}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${HF_API_TOKEN}`,
+          },
+          body: JSON.stringify({
+            inputs: prompt,
+            parameters: {
+              max_new_tokens: 800,
+              temperature: 0.2,
+              return_full_text: false,  // only return the generated part, not the prompt
+            }
+          })
+        }
+      );
 
-    const data = await response.json();
-    const raw = (data.content || []).map(b => b.text || "").join("");
-    const clean = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
+      data = await response.json();
 
+      // 503 = model is warming up; wait and retry
+      if (response.status === 503 && data.estimated_time) {
+        const wait = Math.min((data.estimated_time || 20) * 1000, 25000);
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
+      break;
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || `HF API error ${response.status}`);
+    }
+
+    // HF returns [{ generated_text: "..." }]
+    const raw = Array.isArray(data)
+      ? (data[0].generated_text || "")
+      : (data.generated_text || JSON.stringify(data));
+
+    const parsed = extractJSON(raw);
     parsed.overall_score = clamp(calcScore(parsed.scores), 0, 100);
 
     state.result = parsed;
     state.view = "report";
     render();
+
   } catch(err) {
     state.view = "input";
-    state.error = "Evaluation failed. The AI may have returned an unexpected response. Please try again.";
+    state.error = "Evaluation failed: " + (err.message || "unexpected response. Please try again.");
     render();
   }
 }
