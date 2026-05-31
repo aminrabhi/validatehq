@@ -593,95 +593,34 @@ function bindEvents() {
   if (back) back.addEventListener("click", () => { state.view = "input"; state.result = null; state.error = null; render(); });
 }
 
-// Extracts the first valid JSON object from a string (handles text before/after)
-function extractJSON(text) {
-  const start = text.indexOf("{");
-  const end   = text.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("No JSON found");
-  return JSON.parse(text.slice(start, end + 1));
-}
 
 async function runEval(idea) {
   state.view = "loading";
   state.error = null;
   render();
 
-  // Mistral instruct format: [INST] system + user [/INST]
-  const prompt = `<s>[INST] You are a strict startup idea evaluation engine. You must output ONLY valid JSON — no explanation, no markdown, no backticks.
-
-Evaluate the startup idea using this rubric (score each 0-10):
-- market_demand
-- competition
-- revenue_potential
-- technical_feasibility
-- go_to_market_difficulty
-
-Return EXACTLY this JSON structure:
-{
-  "idea_summary": "1-2 sentence description of the idea",
-  "scores": {
-    "market_demand": <number 0-10>,
-    "competition": <number 0-10>,
-    "revenue_potential": <number 0-10>,
-    "technical_feasibility": <number 0-10>,
-    "go_to_market_difficulty": <number 0-10>
-  },
-  "overall_score": <number 0-100>,
-  "strengths": ["string", "string", "string"],
-  "risks": ["string", "string", "string"],
-  "opportunities": ["string", "string", "string"],
-  "validation_steps": ["string", "string", "string"],
-  "verdict": "One neutral sentence summarizing the idea's viability."
-}
-
-Startup idea to evaluate: ${idea} [/INST]`;
-
   try {
-    // HF will return 503 if the model is loading — retry up to 3 times
-    let response, data;
-    for (let attempt = 0; attempt < 3; attempt++) {
-const response = await fetch("/api/evaluate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    idea
-  })
-});
+    const response = await fetch("/api/evaluate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idea })
+    });
 
-const parsed = await response.json();
-
-      data = await response.json();
-
-      // 503 = model is warming up; wait and retry
-      if (response.status === 503 && data.estimated_time) {
-        const wait = Math.min((data.estimated_time || 20) * 1000, 25000);
-        await new Promise(r => setTimeout(r, wait));
-        continue;
-      }
-      break;
-    }
+    const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || `HF API error ${response.status}`);
+      throw new Error(data.error || `API error ${response.status}`);
     }
 
-    // HF returns [{ generated_text: "..." }]
-    const raw = Array.isArray(data)
-      ? (data[0].generated_text || "")
-      : (data.generated_text || JSON.stringify(data));
+    data.overall_score = clamp(calcScore(data.scores), 0, 100);
 
-    const parsed = extractJSON(raw);
-    parsed.overall_score = clamp(calcScore(parsed.scores), 0, 100);
-
-    state.result = parsed;
+    state.result = data;
     state.view = "report";
     render();
 
   } catch(err) {
     state.view = "input";
-    state.error = "Evaluation failed: " + (err.message || "unexpected response. Please try again.");
+    state.error = "Evaluation failed: " + (err.message || "Unexpected response. Please try again.");
     render();
   }
 }
