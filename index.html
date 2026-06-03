@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.10);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #1A1916;
+    --text-muted: #6B6860;
+    --text-faint: #A09E99;
+    --accent: #1A1916;
+    --accent-hover: #3A3830;
+    --green: #1D9E75;
+    --amber: #BA7517;
+    --red: #A32D2D;
+    --score-high: #1D9E75;
+    --score-mid: #BA7517;
+    --score-low: #A32D2D;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  #app { width: 100%; }
+
+  .landing {
+    padding: 3rem 2rem 4rem;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 7px; height: 7px; background: var(--text); border-radius: 50%; display: inline-block; }
+
+  .hero-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 1rem;
+  }
+
+  .hero-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-bottom: 2.5rem;
+    max-width: 480px;
+  }
+
+  .input-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: transparent;
+    resize: none;
+    line-height: 1.6;
+    min-height: 120px;
+  }
+  textarea::placeholder { color: var(--text-faint); }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .char-count { font-size: 12px; color: var(--text-faint); font-family: 'DM Mono', monospace; }
+
+  .cta-btn {
+    background: var(--text);
+    color: #FFF;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 22px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .cta-btn:hover { background: var(--accent-hover); }
+  .cta-btn:active { transform: scale(0.98); }
+  .cta-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .hint-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 3rem;
+  }
+  .hint-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .hint-pill:hover { border-color: var(--border-strong); color: var(--text); }
+
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .trust-item { font-size: 12px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; }
+  .trust-dot { width: 4px; height: 4px; background: var(--green); border-radius: 50%; }
+
+  .loading-state {
+    padding: 5rem 2rem;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .loading-orb {
+    width: 52px; height: 52px;
+    border: 2px solid var(--border);
+    border-top-color: var(--text);
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  .loading-sub { font-size: 13px; color: var(--text-muted); }
+
+  .report {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 2rem 5rem;
+  }
+
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 13px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .back-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+  .report-actions { display: flex; gap: 8px; }
+
+  .print-btn {
+    background: var(--text);
+    color: #FFF;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .print-btn:hover { background: var(--accent-hover); }
+
+  .score-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .score-circle {
+    flex-shrink: 0;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2.5px solid;
+  }
+  .score-circle .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .score-circle .denom { font-size: 10px; color: inherit; opacity: 0.55; margin-top: 1px; }
+
+  .score-high-c { border-color: var(--green); color: var(--green); }
+  .score-mid-c  { border-color: var(--amber); color: var(--amber); }
+  .score-low-c  { border-color: var(--red);   color: var(--red); }
+
+  .score-meta { flex: 1; min-width: 0; }
+  .score-verdict {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  .score-summary { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+  .section { margin-bottom: 1.25rem; }
+  .section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.75rem;
+    padding-left: 2px;
+  }
+
+  .rubric-grid {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .rubric-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .rubric-row:last-child { border-bottom: none; }
+
+  .rubric-label { flex: 1; font-size: 13.5px; font-weight: 500; }
+  .rubric-bar-wrap { flex: 2; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+  .rubric-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .rubric-score {
+    width: 28px; text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; font-weight: 500;
+  }
+
+  .insights-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 540px) { .insights-grid { grid-template-columns: 1fr; } }
+
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .insight-card-header {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .insight-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .dot-green { background: var(--green); }
+  .dot-red   { background: var(--red); }
+  .dot-amber { background: var(--amber); }
+
+  .insight-list { list-style: none; }
+  .insight-list li {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .insight-list li:last-child { border-bottom: none; }
+
+  .steps-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-row:last-child { border-bottom: none; }
+  .step-num {
+    width: 22px; height: 22px;
+    background: var(--bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-text { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
+
+  .error-box {
+    background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;
+    padding: 1rem 1.25rem; font-size: 13.5px; color: #A32D2D; margin-bottom: 1rem;
+  }
+
+  /* ── SITE HEADER ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(247, 245, 240, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .site-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .site-header-logo img {
+    height: 42px;
+    width: auto;
+    display: block;
+  }
+
+  /* Fallback text logo if image fails to load */
+  .site-header-logo .logo-fallback {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .site-header-logo .logo-fallback .logo-dot {
+    width: 6px; height: 6px;
+    background: var(--text);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .nav-link:hover {
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  /* ── SITE FOOTER ── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 1.75rem 2rem;
+    text-align: center;
+  }
+
+  .footer-credit {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .footer-link {
+    font-size: 11.5px;
+    color: var(--text-faint);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .footer-link:hover {
+    color: var(--text-muted);
+    border-color: var(--text-faint);
+  }
+
+  @media print {
+    .report-header, .back-btn, .print-btn, .site-header, .site-footer { display: none !important; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<!-- ── SITE HEADER ── -->
+<header class="site-header">
+  <a href="/" class="site-header-logo">
+    <img src="logo.png" alt="ValidateHQ" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <span class="logo-fallback" style="display:none;">
+      <span class="logo-dot"></span>ValidateHQ
+    </span>
+  </a>
+  <nav class="site-nav">
+    <a href="/learn-more.html" class="nav-link">Learn More</a>
+  </nav>
+</header>
+
+<div id="app"></div>
+
+<!-- ── SITE FOOTER ── -->
+<footer class="site-footer">
+  <p class="footer-credit">Made with ❤ by Amin Rabhi</p>
+  <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
+</footer>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const HF_API_TOKEN = "HF_API_TOKEN"; // ← paste your Hugging Face token
+const HF_MODEL = "HF_MODEL";
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HINTS = [
+  "An AI tutor for adult learners returning to education",
+  "A subscription box for rare, single-origin spices",
+  "Peer-to-peer tool rental marketplace in local neighborhoods",
+  "Mental health check-ins via voice notes with AI insights",
+  "Freelance marketplace focused exclusively on climate projects",
+];
+
+const RUBRIC_LABELS = {
+  market_demand: "Market demand",
+  competition: "Competition",
+  revenue_potential: "Revenue potential",
+  technical_feasibility: "Technical feasibility",
+  go_to_market_difficulty: "Go-to-market difficulty"
+};
+
+function scoreColor(n) {
+  if (n >= 65) return "score-high-c";
+  if (n >= 40) return "score-mid-c";
+  return "score-low-c";
+}
+function barColor(key, val) {
+  if (key === "competition" || key === "go_to_market_difficulty") {
+    return val <= 4 ? "#1D9E75" : val <= 6 ? "#BA7517" : "#A32D2D";
+  }
+  return val >= 7 ? "#1D9E75" : val >= 4 ? "#BA7517" : "#A32D2D";
+}
+function letterGrade(s) {
+  if (s >= 80) return "A";
+  if (s >= 65) return "B";
+  if (s >= 50) return "C";
+  if (s >= 35) return "D";
+  return "F";
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function calcScore(scores) {
+  return clamp(
+    (scores.market_demand + scores.revenue_potential + scores.technical_feasibility
+      - scores.competition - scores.go_to_market_difficulty) * 2,
+    0, 100
+  );
+}
+
+let state = { view: "input", idea: "", loading: false, result: null, error: null };
+
+function render() {
+  const app = document.getElementById("app");
+  if (state.view === "input") app.innerHTML = renderInput();
+  else if (state.view === "loading") app.innerHTML = renderLoading();
+  else if (state.view === "report") app.innerHTML = renderReport();
+  bindEvents();
+}
+
+function renderInput() {
+  const len = state.idea.length;
+  return `
+  <div class="landing">
+    <div class="hero-label">Startup Idea Evaluator</div>
+    <h1 class="hero-heading">Is your idea<br><em>worth pursuing?</em></h1>
+    <p class="hero-sub">Paste your startup idea below. Our AI evaluation engine scores it across five dimensions and returns a structured analyst report — instantly.</p>
+
+    <div class="input-wrapper">
+      <textarea id="idea-input" placeholder="Describe your startup idea in a sentence or two. The more specific, the better." maxlength="1200">${escHtml(state.idea)}</textarea>
+      <div class="input-footer">
+        <span class="char-count" id="cc">${len} / 1200</span>
+        <button class="cta-btn" id="analyze-btn" ${len < 10 ? "disabled" : ""}>Analyze idea →</button>
+      </div>
+    </div>
+
+    <div class="hint-pills">
+      ${HINTS.map((h,i) => `<button class="hint-pill" data-hint="${i}">Try: "${h.slice(0,42)}…"</button>`).join("")}
+    </div>
+
+    ${state.error ? `<div class="error-box">${escHtml(state.error)}</div>` : ""}
+  </div>`;
+}
+
+function renderLoading() {
+  return `
+  <div class="loading-state">
+    <div class="loading-orb"></div>
+    <div class="loading-label">Evaluating your idea…</div>
+    <p class="loading-sub">Running rubric analysis across five dimensions.<br>This takes about 10–20 seconds.</p>
+  </div>`;
+}
+
+function renderReport() {
+  const r = state.result;
+  const overall = r.overall_score ?? calcScore(r.scores);
+  const grade = letterGrade(overall);
+  const cc = scoreColor(overall);
+  const sk = Object.keys(RUBRIC_LABELS);
+
+  return `
+  <div class="report">
+    <div class="report-header">
+      <button class="back-btn" id="back-btn">← New idea</button>
+      <div class="report-actions">
+        <button class="print-btn" onclick="window.print()">↓ Export PDF</button>
+      </div>
+    </div>
+
+    <div class="score-hero">
+      <div class="score-circle ${cc}">
+        <span class="num">${overall}</span>
+        <span class="denom">/ 100 · ${grade}</span>
+      </div>
+      <div class="score-meta">
+        <div class="score-verdict">${escHtml(r.verdict)}</div>
+        <div class="score-summary">${escHtml(r.idea_summary)}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Rubric Breakdown</div>
+      <div class="rubric-grid">
+        ${sk.map(key => {
+          const val = r.scores[key] ?? 0;
+          const bc = barColor(key, val);
+          return `
+          <div class="rubric-row">
+            <span class="rubric-label">${RUBRIC_LABELS[key]}</span>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" style="width:${val * 10}%; background:${bc};"></div></div>
+            <span class="rubric-score" style="color:${bc}">${val}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Insights</div>
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-card-header" style="color:var(--green)"><span class="insight-dot dot-green"></span>Strengths</div>
+          <ul class="insight-list">${(r.strengths||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
+        </div>
+        <div class="insight-card">
+          <div class="insight-card-header" style="color:var(--red)"><span class="insight-dot dot-red"></span>Risks</div>
+          <ul class="insight-list">${(r.risks||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
+        </div>
+        <div class="insight-card">
+          <div class="insight-card-header" style="color:var(--amber)"><span class="insight-dot dot-amber"></span>Opportunities</div>
+          <ul class="insight-list">${(r.opportunities||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Validation Action Plan</div>
+      <div class="steps-card">
+        ${(r.validation_steps||[]).map((s,i)=>`
+        <div class="step-row">
+          <div class="step-num">${i+1}</div>
+          <div class="step-text">${escHtml(s)}</div>
+        </div>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+  
+function escHtml(str) {
+  if (!str) return "";
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function bindEvents() {
+  const ta = document.getElementById("idea-input");
+  if (ta) {
+    ta.addEventListener("input", () => {
+      state.idea = ta.value;
+      const cc = document.getElementById("cc");
+      if (cc) cc.textContent = ta.value.length + " / 1200";
+      const btn = document.getElementById("analyze-btn");
+      if (btn) btn.disabled = ta.value.trim().length < 10;
+    });
+  }
+
+  const analyze = document.getElementById("analyze-btn");
+  if (analyze) {
+    analyze.addEventListener("click", () => {
+      const idea = state.idea.trim();
+      if (idea.length < 10) return;
+      runEval(idea);
+    });
+  }
+
+  document.querySelectorAll(".hint-pill").forEach(p => {
+    p.addEventListener("click", () => {
+      const idx = parseInt(p.dataset.hint);
+      state.idea = HINTS[idx];
+      state.error = null;
+      render();
+    });
+  });
+
+  const back = document.getElementById("back-btn");
+  if (back) back.addEventListener("click", () => { state.view = "input"; state.result = null; state.error = null; render(); });
+}
+
+
+async function runEval(idea) {
+  state.view = "loading";
+  state.error = null;
+  render();
+
+  try {
+    const response = await fetch("/api/evaluate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idea })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || `API error ${response.status}`);
+    }
+
+    data.overall_score = clamp(calcScore(data.scores), 0, 100);
+
+    state.result = data;
+    state.view = "report";
+    render();
+
+  } catch(err) {
+    state.view = "input";
+    state.error = "Evaluation failed: " + (err.message || "Unexpected response. Please try again.");
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
