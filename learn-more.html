@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn More — ValidateHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface-2: #F0EDE6;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.16);
+  --text: #1A1916;
+  --text-muted: #6B6860;
+  --text-faint: #A09E99;
+  --accent: #1A1916;
+  --green: #1D9E75;
+  --amber: #BA7517;
+  --red: #A32D2D;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(247,245,240,0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.header-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: var(--text);
+  text-decoration: none;
+  display: flex; align-items: center; gap: 7px;
+}
+.logo-dot { width: 6px; height: 6px; background: var(--text); border-radius: 50%; display: inline-block; }
+.header-logo img { height: 42px; width: auto; }
+.header-nav { display: flex; align-items: center; gap: 8px; }
+.nav-link {
+  font-size: 13px; font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.nav-link:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
+.nav-link.primary {
+  background: var(--text); color: #fff;
+  border-color: var(--text);
+}
+.nav-link.primary:hover { background: #3A3830; border-color: #3A3830; color: #fff; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 100px 2rem 6rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-grid {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+#grid-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+
+.hero-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.1s ease forwards;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  max-width: 720px;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.2s ease forwards;
+}
+.hero h1 em { font-style: italic; color: var(--text-muted); }
+.hero-sub {
+  font-size: 16px; color: var(--text-muted); line-height: 1.7;
+  max-width: 520px; margin: 0 auto 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.35s ease forwards;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--text); color: #fff;
+  text-decoration: none;
+  padding: 13px 28px;
+  border-radius: 11px;
+  font-size: 15px; font-weight: 500;
+  transition: background 0.15s, transform 0.1s;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.5s ease forwards;
+}
+.hero-cta:hover { background: #3A3830; transform: translateY(-1px); }
+
+/* Phone Mockup */
+.phone-wrap {
+  margin-top: 4rem;
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.6s ease forwards;
+  perspective: 1000px;
+}
+.phone {
+  width: 300px;
+  background: #1a1916;
+  border-radius: 44px;
+  padding: 14px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 40px 100px rgba(0,0,0,0.25),
+    0 12px 32px rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: phoneFloat 5s ease-in-out infinite;
+  position: relative;
+}
+@keyframes phoneFloat {
+  0%,100% { transform: translateY(0) rotate(-1deg) rotateX(2deg); }
+  50% { transform: translateY(-14px) rotate(0.8deg) rotateX(-1deg); }
+}
+.phone-inner {
+  background: #F7F5F0;
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+}
+/* Dynamic island */
+.phone-island {
+  position: absolute;
+  top: 12px; left: 50%; transform: translateX(-50%);
+  width: 90px; height: 28px;
+  background: #1a1916;
+  border-radius: 20px;
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.phone-island-cam {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #111;
+  border: 1.5px solid #333;
+  box-shadow: inset 0 0 0 2px #222, 0 0 0 1px #444;
+}
+.phone-island-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+/* Screen content */
+.phone-screen {
+  padding: 56px 16px 20px;
+  min-height: 540px;
+}
+/* App header bar */
+.ph-app-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.ph-app-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 13px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 5px;
+}
+.ph-app-dot { width: 5px; height: 5px; background: var(--text); border-radius: 50%; }
+.ph-share-btn {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text-muted);
+}
+
+/* Score hero */
+.ph-score-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.ph-score-ring {
+  flex-shrink: 0;
+  position: relative;
+  width: 64px; height: 64px;
+}
+.ph-score-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ph-score-ring-track { fill: none; stroke: #f0ede6; stroke-width: 5; }
+.ph-score-ring-fill {
+  fill: none; stroke: var(--green); stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 163;
+  stroke-dashoffset: 50;
+  animation: ringFill 1.8s 1s ease forwards;
+}
+@keyframes ringFill {
+  from { stroke-dashoffset: 163; }
+  to { stroke-dashoffset: 50; }
+}
+.ph-score-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ph-score-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; line-height: 1; color: var(--green);
+}
+.ph-score-sub { font-size: 7px; color: var(--text-faint); margin-top: 1px; font-family: 'DM Mono',monospace; }
+.ph-score-right { flex: 1; min-width: 0; }
+.ph-verdict-label { font-size: 7.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px; }
+.ph-verdict-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 11px; line-height: 1.4; color: var(--text);
+}
+.ph-grade-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 6px;
+  background: var(--green); color: #fff;
+  font-size: 11px; font-weight: 700;
+  margin-top: 5px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Rubric rows */
+.ph-section-title {
+  font-size: 7.5px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-faint);
+  margin-bottom: 7px;
+}
+.ph-rubric-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px; margin-bottom: 10px;
+}
+.ph-rubric-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.ph-rubric-row:last-child { margin-bottom: 0; }
+.ph-rlabel { font-size: 8.5px; color: var(--text-muted); width: 80px; flex-shrink: 0; }
+.ph-rtrack { flex: 1; height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.ph-rbar { height: 100%; border-radius: 2px; animation: barIn 1s ease forwards; transform-origin: left; }
+@keyframes barIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.ph-rscore { font-family: 'DM Mono',monospace; font-size: 8px; width: 10px; text-align: right; }
+
+/* Insight pills */
+.ph-tags-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.ph-tag {
+  font-size: 8px; padding: 3px 8px;
+  border-radius: 10px;
+  font-family: 'Outfit',sans-serif;
+}
+.ph-tag-green { background: rgba(29,158,117,0.1); color: var(--green); border: 1px solid rgba(29,158,117,0.2); }
+.ph-tag-red { background: rgba(163,45,45,0.08); color: var(--red); border: 1px solid rgba(163,45,45,0.15); }
+.ph-tag-amber { background: rgba(186,117,23,0.1); color: var(--amber); border: 1px solid rgba(186,117,23,0.2); }
+
+/* Side buttons on phone frame */
+.phone-btn-right {
+  position: absolute; right: -3px; top: 120px;
+  width: 3px; height: 60px; background: #2a2824; border-radius: 0 3px 3px 0;
+}
+.phone-btn-left-1 {
+  position: absolute; left: -3px; top: 90px;
+  width: 3px; height: 28px; background: #2a2824; border-radius: 3px 0 0 3px;
+}
+.phone-btn-left-2 {
+  position: absolute; left: -3px; top: 130px;
+  width: 3px; height: 46px; background: #2a2824; border-radius: 3px 0 0 3px;
+}
+.phone-btn-left-3 {
+  position: absolute; left: -3px; top: 186px;
+  width: 3px; height: 46px; background: #2a2824; border-radius: 3px 0 0 3px;
+}
+
+/* subtle glow behind phone */
+.phone-glow {
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(29,158,117,0.12) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(20px);
+}
+
+/* ── SECTION COMMONS ── */
+section { padding: 6rem 2rem; }
+.section-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.75rem;
+}
+.section-heading {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.02em; line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.section-sub {
+  font-size: 15px; color: var(--text-muted);
+  line-height: 1.7; max-width: 480px;
+}
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── STICKY REPORT BREAKDOWN ── */
+.breakdown-outer {
+  position: relative;
+}
+.breakdown-sticky-container {
+  display: flex;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 4rem;
+  align-items: flex-start;
+}
+.breakdown-report-col {
+  flex: 0 0 360px;
+  position: sticky;
+  top: 90px;
+}
+.breakdown-explain-col {
+  flex: 1;
+  padding-top: 2rem;
+}
+
+/* Big Report Card */
+.big-report {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.07);
+}
+.big-report-header {
+  display: flex; align-items: center; gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.big-score-circle {
+  flex-shrink: 0;
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--amber);
+  color: var(--amber);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: border-color 0.4s, color 0.4s;
+}
+.big-score-circle .num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.7rem; line-height: 1;
+}
+.big-score-circle .denom { font-size: 9px; opacity: 0.55; margin-top: 1px; }
+.big-verdict {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.9rem; line-height: 1.45;
+  transition: color 0.4s;
+}
+
+.report-section-block { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.report-section-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.rblock-title {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-faint);
+  margin-bottom: 0.65rem;
+}
+.rubric-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.rubric-row:last-child { margin-bottom: 0; }
+.rubric-label { font-size: 11px; color: var(--text-muted); width: 110px; flex-shrink: 0; }
+.rubric-bar-wrap { flex: 1; height: 5px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.rubric-bar { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.23,1,0.32,1); }
+.rubric-score { font-family: 'DM Mono', monospace; font-size: 10px; width: 14px; text-align: right; }
+
+.insight-mini { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.insight-mini-card {
+  background: var(--surface-2);
+  border-radius: 8px; padding: 8px 10px;
+}
+.imc-head { font-size: 8px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+.imc-item { font-size: 9px; color: var(--text-muted); line-height: 1.5; }
+.imc-dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; margin-right: 3px; vertical-align: middle; }
+
+.steps-mini { display: flex; flex-direction: column; gap: 6px; }
+.step-mini-row { display: flex; align-items: flex-start; gap: 8px; }
+.step-mini-num {
+  width: 18px; height: 18px; flex-shrink: 0;
+  background: var(--surface-2); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 600; color: var(--text-muted);
+}
+.step-mini-text { font-size: 11px; color: var(--text-muted); line-height: 1.5; padding-top: 1px; }
+
+/* Report highlight states */
+.highlight-target {
+  border-radius: 8px;
+  transition: background 0.35s, box-shadow 0.35s;
+}
+.highlight-target.is-highlighted {
+  background: rgba(186, 117, 23, 0.07);
+  box-shadow: 0 0 0 2px rgba(186, 117, 23, 0.25);
+}
+.highlight-target.is-highlighted.hl-green {
+  background: rgba(29, 158, 117, 0.07);
+  box-shadow: 0 0 0 2px rgba(29, 158, 117, 0.25);
+}
+.highlight-target.is-highlighted.hl-red {
+  background: rgba(163, 45, 45, 0.07);
+  box-shadow: 0 0 0 2px rgba(163, 45, 45, 0.2);
+}
+
+/* Explain panels */
+.explain-panel {
+  padding: 3.5rem 0;
+  border-bottom: 1px solid var(--border);
+  min-height: 55vh;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.explain-panel:last-child { border-bottom: none; }
+.explain-panel .section-label { margin-bottom: 0.5rem; }
+.explain-panel .section-heading { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 0.85rem; }
+.explain-panel .section-sub { margin-bottom: 1.5rem; }
+
+.grade-table {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 12.5px;
+  max-width: 220px;
+}
+.grade-table-row {
+  display: flex; align-items: center;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+.grade-table-row:last-child { border-bottom: none; }
+.grade-cell { font-family: 'DM Mono', monospace; font-weight: 500; width: 20px; }
+.range-cell { color: var(--text-muted); flex: 1; }
+.grade-a { color: var(--green); }
+.grade-b { color: #2a8f5e; }
+.grade-c { color: var(--amber); }
+.grade-d { color: #c47a1a; }
+.grade-f { color: var(--red); }
+
+/* ── METRICS DEEP DIVE ── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  max-width: 1000px;
+  margin: 3rem auto 0;
+}
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.metric-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.08); transform: translateY(-2px); }
+.metric-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.metric-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+.metric-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; }
+.metric-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 1rem; }
+.metric-tag {
+  font-size: 11px; padding: 3px 10px;
+  border-radius: 12px; border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.metric-visual { height: 48px; position: relative; overflow: hidden; }
+
+/* chart vis */
+.bars-vis { display: flex; align-items: flex-end; gap: 4px; height: 100%; }
+.bar-vis {
+  flex: 1; border-radius: 3px 3px 0 0;
+  background: var(--green);
+  animation: barGrow 1.2s ease forwards;
+  transform-origin: bottom;
+}
+@keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+.nodes-vis {
+  position: relative; height: 100%;
+}
+.node-vis {
+  position: absolute;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--text-muted);
+  animation: nodePop 0.4s ease forwards;
+  opacity: 0;
+}
+@keyframes nodePop { to { opacity: 1; transform: scale(1); } }
+
+/* ── INSIGHTS SECTION ── */
+.insights-section { background: var(--surface); }
+.insights-section-inner { max-width: 900px; margin: 0 auto; }
+.insights-trio {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem; margin-top: 3rem;
+}
+.insight-big-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  background: var(--bg);
+}
+.insight-big-card .ihead {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.insight-dot-big { width: 6px; height: 6px; border-radius: 50%; }
+.insight-items { display: flex; flex-direction: column; gap: 7px; }
+.insight-item-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.insight-item-row.animated { opacity: 1; transform: none; }
+
+/* ── VALIDATION PLAN ── */
+.plan-section {
+  background: var(--text);
+  color: #fff;
+}
+.plan-section .section-label { color: rgba(255,255,255,0.35); }
+.plan-section .section-heading { color: #fff; }
+.plan-section .section-sub { color: rgba(255,255,255,0.55); }
+.plan-steps {
+  max-width: 680px; margin: 3rem auto 0;
+  display: flex; flex-direction: column; gap: 0;
+}
+.plan-step {
+  display: flex; align-items: flex-start; gap: 1.5rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  opacity: 0; transform: translateX(-20px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.plan-step:last-child { border-bottom: none; }
+.plan-step.visible { opacity: 1; transform: none; }
+.plan-step-num {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+.plan-step-body h4 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem; margin-bottom: 0.35rem;
+}
+.plan-step-body p { font-size: 13.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+/* ── FAQ ── */
+.faq-section { max-width: 680px; margin: 0 auto; }
+.faq-list { margin-top: 3rem; display: flex; flex-direction: column; gap: 0; }
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.faq-item:first-child { border-top: 1px solid var(--border); }
+.faq-q {
+  width: 100%; background: none; border: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px; font-weight: 500;
+  color: var(--text);
+  cursor: pointer; text-align: left;
+  gap: 1rem;
+}
+.faq-q:hover { color: var(--text-muted); }
+.faq-icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border-radius: 50%; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--text-muted);
+  transition: transform 0.25s, background 0.2s;
+}
+.faq-item.open .faq-icon { transform: rotate(45deg); background: var(--text); color: #fff; border-color: var(--text); }
+.faq-a {
+  font-size: 14px; color: var(--text-muted); line-height: 1.7;
+  padding-bottom: 1.1rem;
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.25s ease;
+}
+.faq-item.open .faq-a { max-height: 300px; }
+
+/* ── FINAL CTA ── */
+.final-cta {
+  padding: 8rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.final-cta-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(29,158,117,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.score-reel {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 2rem;
+  height: 1.1em;
+  overflow: hidden;
+  position: relative;
+}
+.score-reel-inner {
+  display: flex; flex-direction: column;
+  align-items: center;
+  transition: transform 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.score-reel-item { height: 1.1em; display: flex; align-items: center; justify-content: center; }
+
+.final-heading {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  line-height: 1.2; letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+.final-sub { font-size: 15px; color: var(--text-muted); margin-bottom: 2.5rem; }
+.final-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--text); color: #fff;
+  text-decoration: none;
+  padding: 15px 32px;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 500;
+  transition: background 0.15s, transform 0.1s;
+}
+.final-btn:hover { background: #3A3830; transform: translateY(-1px); }
+
+/* ── FOOTER ── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 1.75rem 2rem;
+  text-align: center;
+}
+.footer-credit { font-size: 12.5px; color: var(--text-faint); margin-bottom: 0.5rem; }
+.footer-link {
+  font-size: 11.5px; color: var(--text-faint);
+  text-decoration: none; border-bottom: 1px solid var(--border);
+  padding-bottom: 1px; transition: color 0.15s, border-color 0.15s;
+}
+.footer-link:hover { color: var(--text-muted); border-color: var(--text-faint); }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .breakdown-sticky-container { flex-direction: column; }
+  .breakdown-report-col { position: static; flex: none; width: 100%; }
+  .insights-trio { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a href="index.html" class="header-logo">
+    <img src="logo.png" alt="ValidateHQ" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <span style="display:none;align-items:center;gap:7px;font-family:'DM Serif Display',serif;font-size:1.1rem;">
+      <span class="logo-dot"></span>ValidateHQ
+    </span>
+  </a>
+  <nav class="header-nav">
+    <a href="learn-more.html" class="nav-link" style="color:var(--text)">Learn More</a>
+    <a href="index.html" class="nav-link primary">Try it free →</a>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════════ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg-grid"><canvas id="grid-canvas"></canvas></div>
+  <div class="hero-label">How it works</div>
+  <h1>Turn startup ideas into<br><em>data-driven decisions.</em></h1>
+  <p class="hero-sub">Learn how ValidateHQ evaluates market demand, competition, revenue potential, technical feasibility, and go-to-market challenges — before you spend months building.</p>
+  <a href="index.html" class="hero-cta">Analyze my idea →</a>
+
+  <!-- Phone Mockup -->
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="phone">
+      <!-- Frame buttons -->
+      <div class="phone-btn-right"></div>
+      <div class="phone-btn-left-1"></div>
+      <div class="phone-btn-left-2"></div>
+      <div class="phone-btn-left-3"></div>
+
+      <div class="phone-inner">
+        <!-- Dynamic Island -->
+        <div class="phone-island">
+          <div class="phone-island-dot"></div>
+          <div class="phone-island-cam"></div>
+        </div>
+
+        <div class="phone-screen">
+          <!-- App bar -->
+          <div class="ph-app-bar">
+            <div class="ph-app-name"><span class="ph-app-dot"></span>ValidateHQ</div>
+            <div class="ph-share-btn">↑</div>
+          </div>
+
+          <!-- Score card -->
+          <div class="ph-score-card">
+            <div class="ph-score-ring">
+              <svg viewBox="0 0 64 64" width="64" height="64">
+                <circle class="ph-score-ring-track" cx="32" cy="32" r="26"/>
+                <circle class="ph-score-ring-fill" cx="32" cy="32" r="26"/>
+              </svg>
+              <div class="ph-score-inner">
+                <span class="ph-score-num">69</span>
+                <span class="ph-score-sub">/ 100</span>
+              </div>
+            </div>
+            <div class="ph-score-right">
+              <div class="ph-verdict-label">Verdict</div>
+              <div class="ph-verdict-text">Strong market pull, competitive moat needed</div>
+              <div class="ph-grade-badge">B</div>
+            </div>
+          </div>
+
+          <!-- Rubric -->
+          <div class="ph-section-title">Rubric Breakdown</div>
+          <div class="ph-rubric-card">
+            <div class="ph-rubric-row">
+              <span class="ph-rlabel">Market demand</span>
+              <div class="ph-rtrack"><div class="ph-rbar" style="width:80%;background:#1D9E75;animation-delay:0.1s;"></div></div>
+              <span class="ph-rscore" style="color:#1D9E75">8</span>
+            </div>
+            <div class="ph-rubric-row">
+              <span class="ph-rlabel">Competition</span>
+              <div class="ph-rtrack"><div class="ph-rbar" style="width:60%;background:#BA7517;animation-delay:0.2s;"></div></div>
+              <span class="ph-rscore" style="color:#BA7517">6</span>
+            </div>
+            <div class="ph-rubric-row">
+              <span class="ph-rlabel">Revenue potential</span>
+              <div class="ph-rtrack"><div class="ph-rbar" style="width:70%;background:#1D9E75;animation-delay:0.3s;"></div></div>
+              <span class="ph-rscore" style="color:#1D9E75">7</span>
+            </div>
+            <div class="ph-rubric-row">
+              <span class="ph-rlabel">Tech feasibility</span>
+              <div class="ph-rtrack"><div class="ph-rbar" style="width:90%;background:#1D9E75;animation-delay:0.4s;"></div></div>
+              <span class="ph-rscore" style="color:#1D9E75">9</span>
+            </div>
+            <div class="ph-rubric-row">
+              <span class="ph-rlabel">GTM difficulty</span>
+              <div class="ph-rtrack"><div class="ph-rbar" style="width:50%;background:#BA7517;animation-delay:0.5s;"></div></div>
+              <span class="ph-rscore" style="color:#BA7517">5</span>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="ph-section-title">Insights</div>
+          <div class="ph-tags-row">
+            <span class="ph-tag ph-tag-green">✓ Large market</span>
+            <span class="ph-tag ph-tag-green">✓ Clear pain point</span>
+            <span class="ph-tag ph-tag-red">✗ Crowded space</span>
+            <span class="ph-tag ph-tag-amber">↗ AI tailwinds</span>
+            <span class="ph-tag ph-tag-amber">↗ Niche segment</span>
+            <span class="ph-tag ph-tag-red">✗ Weak moat</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════ BREAKDOWN ══ -->
+<section style="padding: 5rem 2rem;" id="breakdown-section">
+  <div class="breakdown-sticky-container">
+
+    <!-- Left: Big Report -->
+    <div class="breakdown-report-col reveal" id="report-col">
+      <div class="big-report">
+        <!-- Score Header -->
+        <div class="highlight-target" id="hl-score" style="padding: 0.5rem; margin: -0.5rem -0.5rem 0.75rem;">
+          <div class="big-report-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+            <div class="big-score-circle" id="big-score-circle">
+              <span class="num" id="big-score-num">24</span>
+              <span class="denom">/ 100 · <span id="big-score-grade">F</span></span>
+            </div>
+            <div class="big-verdict" id="big-verdict">High potential, requires careful execution and market validation</div>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 0.75rem 0 1rem;">
+
+        <!-- Rubric -->
+        <div class="report-section-block highlight-target" id="hl-rubric">
+          <div class="rblock-title">Rubric Breakdown</div>
+          <div class="rubric-row">
+            <span class="rubric-label">Market demand</span>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" id="rb-md" style="width:70%;background:#1D9E75;"></div></div>
+            <span class="rubric-score" style="color:#1D9E75">7</span>
+          </div>
+          <div class="rubric-row">
+            <span class="rubric-label">Competition</span>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" id="rb-co" style="width:60%;background:#BA7517;"></div></div>
+            <span class="rubric-score" style="color:#BA7517">6</span>
+          </div>
+          <div class="rubric-row">
+            <span class="rubric-label">Revenue potential</span>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" id="rb-rp" style="width:50%;background:#BA7517;"></div></div>
+            <span class="rubric-score" style="color:#BA7517">5</span>
+          </div>
+          <div class="rubric-row">
+            <span class="rubric-label">Tech feasibility</span>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" id="rb-tf" style="width:80%;background:#1D9E75;"></div></div>
+            <span class="rubric-score" style="color:#1D9E75">8</span>
+          </div>
+          <div class="rubric-row">
+            <span class="rubric-label">GTM difficulty</span>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" id="rb-gtm" style="width:70%;background:#BA7517;"></div></div>
+            <span class="rubric-score" style="color:#BA7517">7</span>
+          </div>
+        </div>
+
+        <!-- Insights mini -->
+        <div class="report-section-block highlight-target hl-green" id="hl-insights">
+          <div class="rblock-title">Insights</div>
+          <div class="insight-mini">
+            <div class="insight-mini-card">
+              <div class="imc-head" style="color:var(--green)"><span class="imc-dot" style="background:var(--green);"></span>Strengths</div>
+              <div class="imc-item">Large market</div>
+              <div class="imc-item">Clear pain point</div>
+              <div class="imc-item">Monetizable</div>
+            </div>
+            <div class="insight-mini-card">
+              <div class="imc-head" style="color:var(--red)"><span class="imc-dot" style="background:var(--red);"></span>Risks</div>
+              <div class="imc-item">Crowded market</div>
+              <div class="imc-item">Regulatory risk</div>
+              <div class="imc-item">Weak moat</div>
+            </div>
+            <div class="insight-mini-card">
+              <div class="imc-head" style="color:var(--amber)"><span class="imc-dot" style="background:var(--amber);"></span>Opps</div>
+              <div class="imc-item">AI tailwinds</div>
+              <div class="imc-item">Reg. change</div>
+              <div class="imc-item">New segment</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Steps mini -->
+        <div class="report-section-block highlight-target" id="hl-steps">
+          <div class="rblock-title">Validation Action Plan</div>
+          <div class="steps-mini">
+            <div class="step-mini-row">
+              <div class="step-mini-num">1</div>
+              <div class="step-mini-text">Conduct 20 customer discovery interviews</div>
+            </div>
+            <div class="step-mini-row">
+              <div class="step-mini-num">2</div>
+              <div class="step-mini-text">Validate core assumptions with a landing page</div>
+            </div>
+            <div class="step-mini-row">
+              <div class="step-mini-num">3</div>
+              <div class="step-mini-text">Build and test a focused MVP in 6 weeks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Explanation Panels -->
+    <div class="breakdown-explain-col">
+
+      <!-- Panel 1: Score -->
+      <div class="explain-panel reveal" data-highlight="hl-score" data-highlight-class="hl-amber">
+        <div class="section-label">Section 01</div>
+        <h2 class="section-heading">The Overall Score</h2>
+        <p class="section-sub">The overall score combines multiple startup success factors into a single 0–100 rating. A higher score suggests stronger market conditions and better execution potential.</p>
+        <div class="grade-table">
+          <div class="grade-table-row"><span class="grade-cell grade-a">A</span><span class="range-cell">90–100</span></div>
+          <div class="grade-table-row"><span class="grade-cell grade-b">B</span><span class="range-cell">80–89</span></div>
+          <div class="grade-table-row"><span class="grade-cell grade-c">C</span><span class="range-cell">70–79</span></div>
+          <div class="grade-table-row"><span class="grade-cell grade-d">D</span><span class="range-cell">60–69</span></div>
+          <div class="grade-table-row"><span class="grade-cell grade-f">F</span><span class="range-cell">Below 60</span></div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Verdict -->
+      <div class="explain-panel reveal" data-highlight="hl-score">
+        <div class="section-label">Section 02</div>
+        <h2 class="section-heading">The Verdict</h2>
+        <p class="section-sub">Every idea receives a concise, plain-language verdict — summarizing its biggest opportunities and the critical challenges worth addressing before you build.</p>
+        <p class="section-sub" style="margin-top:0.75rem;">The verdict is generated fresh for each idea, meaning no two reports are the same. It reflects the specific context, market, and trade-offs unique to your concept.</p>
+      </div>
+
+      <!-- Panel 3: Rubric -->
+      <div class="explain-panel reveal" data-highlight="hl-rubric">
+        <div class="section-label">Section 03</div>
+        <h2 class="section-heading">Rubric Breakdown</h2>
+        <p class="section-sub">Five dimensions, each scored 1–10, give you a granular view of where your idea stands. The scores feed into the overall rating using a weighted formula that rewards market pull and penalizes structural difficulty.</p>
+      </div>
+
+      <!-- Panel 4: Insights -->
+      <div class="explain-panel reveal" data-highlight="hl-insights" data-highlight-class="hl-green">
+        <div class="section-label">Section 04</div>
+        <h2 class="section-heading">Strengths, Risks &amp; Opportunities</h2>
+        <p class="section-sub">Beyond numbers, ValidateHQ surfaces the qualitative picture — what's genuinely working, where the landmines are, and which external shifts could accelerate or derail the idea.</p>
+      </div>
+
+      <!-- Panel 5: Plan -->
+      <div class="explain-panel reveal" data-highlight="hl-steps">
+        <div class="section-label">Section 05</div>
+        <h2 class="section-heading">Validation Action Plan</h2>
+        <p class="section-sub">ValidateHQ doesn't just identify problems — it ends every report with concrete, ordered next steps to reduce uncertainty without burning months of runway on untested assumptions.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════ METRICS DEEP DIVE ══ -->
+<section style="padding: 6rem 2rem;">
+  <div style="max-width:1000px;margin:0 auto;">
+    <div class="reveal">
+      <div class="section-label">The Five Dimensions</div>
+      <h2 class="section-heading">What gets measured,<br>and why it matters.</h2>
+      <p class="section-sub">Each metric isolates a distinct risk factor. Together they paint a full picture of viability — from whether the problem exists to whether you can actually reach customers.</p>
+    </div>
+
+    <div class="metrics-grid">
+
+      <div class="metric-card reveal">
+        <div class="metric-icon" style="background:#e8f8f2;">📈</div>
+        <h3>Market Demand</h3>
+        <p>Measures how strongly people appear to need the solution. High scores reflect a clear pain point with an existing, growing audience.</p>
+        <div class="metric-tags">
+          <span class="metric-tag">Clear pain point</span>
+          <span class="metric-tag">Growing market</span>
+          <span class="metric-tag">Existing demand</span>
+        </div>
+        <div class="metric-visual">
+          <div class="bars-vis">
+            <div class="bar-vis" style="height:40%;animation-delay:0s;background:#d4f0e6;"></div>
+            <div class="bar-vis" style="height:55%;animation-delay:0.1s;background:#a8e1cc;"></div>
+            <div class="bar-vis" style="height:65%;animation-delay:0.2s;background:#7dd2b2;"></div>
+            <div class="bar-vis" style="height:75%;animation-delay:0.3s;background:#52c399;"></div>
+            <div class="bar-vis" style="height:90%;animation-delay:0.4s;background:#1D9E75;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card reveal">
+        <div class="metric-icon" style="background:#fef3e2;">⚔️</div>
+        <h3>Competition</h3>
+        <p>Evaluates how crowded the market is and how difficult it may be to carve out a defensible position against existing players.</p>
+        <div class="metric-tags">
+          <span class="metric-tag">Market saturation</span>
+          <span class="metric-tag">Differentiation</span>
+          <span class="metric-tag">Incumbent strength</span>
+        </div>
+        <div class="metric-visual" style="position:relative;">
+          <svg width="100%" height="48" viewBox="0 0 200 48" style="position:absolute;inset:0;">
+            <circle cx="100" cy="24" r="10" fill="none" stroke="#1A1916" stroke-width="1.5"/>
+            <circle cx="60" cy="14" r="7" fill="#e0ddd8" class="comp-node" style="animation: nodePop 0.4s 0.1s ease forwards;opacity:0;"/>
+            <circle cx="145" cy="18" r="8" fill="#e0ddd8" class="comp-node" style="animation: nodePop 0.4s 0.25s ease forwards;opacity:0;"/>
+            <circle cx="70" cy="36" r="6" fill="#e0ddd8" class="comp-node" style="animation: nodePop 0.4s 0.4s ease forwards;opacity:0;"/>
+            <circle cx="135" cy="38" r="7" fill="#e0ddd8" class="comp-node" style="animation: nodePop 0.4s 0.55s ease forwards;opacity:0;"/>
+            <circle cx="35" cy="30" r="5" fill="#e0ddd8" class="comp-node" style="animation: nodePop 0.4s 0.7s ease forwards;opacity:0;"/>
+            <text x="100" y="27.5" text-anchor="middle" font-size="7" fill="#1A1916" font-family="DM Serif Display,serif">you</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="metric-card reveal">
+        <div class="metric-icon" style="background:#fef8e8;">💰</div>
+        <h3>Revenue Potential</h3>
+        <p>Estimates the business's ability to generate meaningful, sustainable revenue based on pricing power and market size.</p>
+        <div class="metric-tags">
+          <span class="metric-tag">Pricing power</span>
+          <span class="metric-tag">Willingness to pay</span>
+          <span class="metric-tag">Market size</span>
+        </div>
+        <div class="metric-visual">
+          <div class="bars-vis">
+            <div class="bar-vis" style="height:30%;background:#f5d98a;animation-delay:0.1s;"></div>
+            <div class="bar-vis" style="height:50%;background:#f0c94a;animation-delay:0.2s;"></div>
+            <div class="bar-vis" style="height:70%;background:#e8b520;animation-delay:0.3s;"></div>
+            <div class="bar-vis" style="height:90%;background:#BA7517;animation-delay:0.4s;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card reveal">
+        <div class="metric-icon" style="background:#f5f0ff;">⚙️</div>
+        <h3>Technical Feasibility</h3>
+        <p>Measures how realistic the product is to build with today's technology and a typical early-stage team.</p>
+        <div class="metric-tags">
+          <span class="metric-tag">Build complexity</span>
+          <span class="metric-tag">Tech maturity</span>
+          <span class="metric-tag">Dependencies</span>
+        </div>
+        <div class="metric-visual">
+          <svg width="100%" height="48" viewBox="0 0 200 48">
+            <rect x="10" y="35" width="30" height="10" rx="2" fill="#e0ddd8" style="animation: nodePop 0.3s 0s forwards;opacity:0;"/>
+            <rect x="50" y="26" width="30" height="19" rx="2" fill="#c8c4bc" style="animation: nodePop 0.3s 0.2s forwards;opacity:0;"/>
+            <rect x="90" y="18" width="30" height="27" rx="2" fill="#a8a49c" style="animation: nodePop 0.3s 0.4s forwards;opacity:0;"/>
+            <rect x="130" y="10" width="30" height="35" rx="2" fill="#1A1916" style="animation: nodePop 0.3s 0.6s forwards;opacity:0;"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="metric-card reveal" style="grid-column: span 1;">
+        <div class="metric-icon" style="background:#fff0f0;">🗺️</div>
+        <h3>Go-To-Market Difficulty</h3>
+        <p>Estimates how challenging customer acquisition and sustained growth may be given the sales cycle, channel complexity, and marketing costs.</p>
+        <div class="metric-tags">
+          <span class="metric-tag">Sales complexity</span>
+          <span class="metric-tag">CAC</span>
+          <span class="metric-tag">Distribution</span>
+        </div>
+        <div class="metric-visual">
+          <svg width="100%" height="48" viewBox="0 0 200 48">
+            <path d="M10,38 Q50,10 90,28 Q130,46 170,20" fill="none" stroke="#e0ddd8" stroke-width="2" stroke-dasharray="4 3"/>
+            <circle cx="10" cy="38" r="4" fill="#1D9E75" style="animation:nodePop 0.3s 0s forwards;opacity:0;"/>
+            <circle cx="90" cy="28" r="4" fill="#BA7517" style="animation:nodePop 0.3s 0.35s forwards;opacity:0;"/>
+            <circle cx="170" cy="20" r="4" fill="#A32D2D" style="animation:nodePop 0.3s 0.7s forwards;opacity:0;"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════ INSIGHTS ══ -->
+<section class="insights-section" style="padding:6rem 2rem;">
+  <div class="insights-section-inner">
+    <div class="reveal">
+      <div class="section-label">Understanding the Report</div>
+      <h2 class="section-heading">More than a number.</h2>
+      <p class="section-sub">The qualitative sections reveal the story behind the score — what's genuinely strong, what could derail the idea, and where external momentum could be captured.</p>
+    </div>
+
+    <div class="insights-trio">
+      <div class="insight-big-card reveal">
+        <div class="ihead" style="color:var(--green)">
+          <span class="insight-dot-big" style="background:var(--green);"></span>Strengths
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:1rem;">The aspects of the idea that create the strongest foundation for long-term success.</p>
+        <div class="insight-items" id="strength-items">
+          <div class="insight-item-row">Large addressable market</div>
+          <div class="insight-item-row">Clear, validated pain point</div>
+          <div class="insight-item-row">Strong monetization path</div>
+        </div>
+      </div>
+
+      <div class="insight-big-card reveal">
+        <div class="ihead" style="color:var(--red)">
+          <span class="insight-dot-big" style="background:var(--red);"></span>Risks
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:1rem;">Potential obstacles that could prevent the idea from gaining traction or scaling.</p>
+        <div class="insight-items" id="risk-items">
+          <div class="insight-item-row">Crowded, well-funded incumbents</div>
+          <div class="insight-item-row">Regulatory uncertainty</div>
+          <div class="insight-item-row">Weak differentiation angle</div>
+        </div>
+      </div>
+
+      <div class="insight-big-card reveal">
+        <div class="ihead" style="color:var(--amber)">
+          <span class="insight-dot-big" style="background:var(--amber);"></span>Opportunities
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:1rem;">External trends, market shifts, or adjacencies that could accelerate success.</p>
+        <div class="insight-items" id="opp-items">
+          <div class="insight-item-row">Emerging AI infrastructure</div>
+          <div class="insight-item-row">Regulatory tailwinds</div>
+          <div class="insight-item-row">Underserved niche segment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════════════════════ VALIDATION PLAN ══ -->
+<section class="plan-section" style="padding:6rem 2rem;">
+  <div style="max-width:680px;margin:0 auto;">
+    <div class="reveal">
+      <div class="section-label">Validation Action Plan</div>
+      <h2 class="section-heading" style="color:#fff;">A roadmap, not just a rating.</h2>
+      <p class="section-sub">ValidateHQ ends every report with ordered, actionable steps to reduce uncertainty before you burn months of runway on the wrong assumptions.</p>
+    </div>
+
+    <div class="plan-steps">
+      <div class="plan-step" id="ps1">
+        <div class="plan-step-num">01</div>
+        <div class="plan-step-body">
+          <h4>Conduct market research</h4>
+          <p>Run 15–20 discovery interviews with target customers to validate whether the pain point is real, urgent, and worth paying for.</p>
+        </div>
+      </div>
+      <div class="plan-step" id="ps2">
+        <div class="plan-step-num">02</div>
+        <div class="plan-step-body">
+          <h4>Validate core assumptions</h4>
+          <p>Build a landing page or concierge test to measure real demand signals before writing a line of product code.</p>
+        </div>
+      </div>
+      <div class="plan-step" id="ps3">
+        <div class="plan-step-num">03</div>
+        <div class="plan-step-body">
+          <h4>Build a focused MVP</h4>
+          <p>Scope the smallest version that delivers the core value. Get it in front of 10 users within 6 weeks and iterate ruthlessly.</p>
+        </div>
+      </div>
+      <div class="plan-step" id="ps4">
+        <div class="plan-step-num">04</div>
+        <div class="plan-step-body">
+          <h4>Measure and iterate</h4>
+          <p>Define one north-star metric. Track it weekly. Let data — not gut feel — drive the next move.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════ FAQ ══ -->
+<section style="padding:6rem 2rem;">
+  <div class="faq-section">
+    <div class="reveal">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-heading">Common questions.</h2>
+    </div>
+
+    <div class="faq-list" id="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-q">How is the score calculated? <span class="faq-icon">+</span></button>
+        <div class="faq-a">ValidateHQ analyzes multiple startup success factors — demand, competition, monetization, feasibility, and distribution — and combines them into a weighted evaluation using a structured rubric. The formula rewards market pull and realistic execution paths while penalizing structural barriers.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Can a low-scoring idea still succeed? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Absolutely. The report identifies risk factors, not certainty. Many successful startups began with difficult markets or low initial scores. The goal is to surface blind spots early — not to discourage bold ideas. Plenty of billion-dollar companies would have scored poorly in their earliest form.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">What industries does ValidateHQ support? <span class="faq-icon">+</span></button>
+        <div class="faq-a">ValidateHQ works best for technology, SaaS, consumer apps, marketplace, and AI-focused businesses. It can evaluate ideas in most industries, though some highly regulated or capital-intensive sectors (pharmaceuticals, hardware, deep-tech) may yield less precise results.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Is my startup idea stored or shared? <span class="faq-icon">+</span></button>
+        <div class="faq-a">We take your privacy seriously. Ideas submitted through ValidateHQ are used solely to generate your report and are not stored, shared with third parties, or used to train AI models. Each evaluation is ephemeral — once your session ends, the data is gone. You can review our full Privacy Policy for details.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">How should I use the validation plan? <span class="faq-icon">+</span></button>
+        <div class="faq-a">Treat the action plan as a structured roadmap for de-risking your idea before making big commitments. Each step is ordered by importance — start at the top. The goal is to test assumptions cheaply, so you only invest serious time and money once you have real-world evidence of demand.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Why did my idea receive a low score? <span class="faq-icon">+</span></button>
+        <div class="faq-a">A low score usually reflects structural challenges — market saturation, monetization complexity, or difficult distribution — rather than the quality of the founder or the idea's long-term potential. Use the rubric breakdown to identify specifically which dimensions are dragging the score down and address those first.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ FINAL CTA ══ -->
+<section class="final-cta">
+  <div class="final-cta-bg"></div>
+  <div class="score-reel" id="score-reel">
+    <div class="score-reel-inner" id="score-reel-inner">
+      <div class="score-reel-item">42</div>
+      <div class="score-reel-item">68</div>
+      <div class="score-reel-item">81</div>
+      <div class="score-reel-item">91</div>
+    </div>
+  </div>
+  <h2 class="final-heading reveal">Every great startup begins<br>with a question.</h2>
+  <p class="final-sub reveal">Validate yours.</p>
+  <a href="index.html" class="final-btn reveal">Analyze My Idea →</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p class="footer-credit">Made with ❤ by Amin Rabhi</p>
+  <a href="privacy-policy.html" class="footer-link">Privacy Policy</a>
+</footer>
+
+<script>
+// ── SCROLL REVEAL ──────────────────────────────────────────────────
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── PLAN STEPS ────────────────────────────────────────────────────
+const stepObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.3 });
+['ps1','ps2','ps3','ps4'].forEach((id, i) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.transitionDelay = (i * 0.12) + 's';
+    stepObserver.observe(el);
+  }
+});
+
+// ── INSIGHT CARDS STAGGER ─────────────────────────────────────────
+function animateInsightItems(containerId, delay) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const obs = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      container.querySelectorAll('.insight-item-row').forEach((item, i) => {
+        setTimeout(() => item.classList.add('animated'), i * 120 + delay);
+      });
+      obs.disconnect();
+    }
+  }, { threshold: 0.5 });
+  obs.observe(container);
+}
+animateInsightItems('strength-items', 0);
+animateInsightItems('risk-items', 80);
+animateInsightItems('opp-items', 160);
+
+// ── BREAKDOWN SCROLL HIGHLIGHT ────────────────────────────────────
+const explainPanels = document.querySelectorAll('.explain-panel');
+const highlightObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const hlId = e.target.dataset.highlight;
+      const hlClass = e.target.dataset.highlightClass;
+      // clear all
+      document.querySelectorAll('.highlight-target').forEach(el => {
+        el.classList.remove('is-highlighted','hl-green','hl-red','hl-amber');
+      });
+      if (hlId) {
+        const target = document.getElementById(hlId);
+        if (target) {
+          target.classList.add('is-highlighted');
+          if (hlClass) target.classList.add(hlClass);
+        }
+      }
+    }
+  });
+}, { threshold: 0.55 });
+explainPanels.forEach(p => highlightObserver.observe(p));
+
+// ── SCORE REEL ANIMATION ──────────────────────────────────────────
+const scores = [42, 68, 81, 91];
+let reelIndex = 0;
+const reelInner = document.getElementById('score-reel-inner');
+const reelHeight = 1.1; // em
+
+function advanceReel() {
+  reelIndex++;
+  if (reelIndex >= scores.length) { reelIndex = scores.length - 1; return; }
+  reelInner.style.transform = `translateY(-${reelIndex * reelHeight}em)`;
+}
+
+const reelObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    let i = 0;
+    const delays = [0, 700, 1400, 2300];
+    delays.forEach((d, idx) => {
+      setTimeout(() => {
+        reelIndex = idx;
+        reelInner.style.transform = `translateY(-${idx * reelHeight}em)`;
+      }, d);
+    });
+    reelObserver.disconnect();
+  }
+}, { threshold: 0.5 });
+const reelEl = document.getElementById('score-reel');
+if (reelEl) reelObserver.observe(reelEl);
+
+// ── WARP GRID CANVAS ──────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('grid-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const CELL = 42;
+  const WARP_RADIUS = 220;
+  const WARP_STRENGTH = 28;
+  const FADE_EASE = 0.08;
+
+  let W, H, cols, rows;
+  let mouse = { x: -9999, y: -9999 };
+  let targetMouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    const hero = canvas.closest('.hero');
+    W = canvas.width = hero.offsetWidth;
+    H = canvas.height = hero.offsetHeight;
+    cols = Math.ceil(W / CELL) + 2;
+    rows = Math.ceil(H / CELL) + 2;
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Track mouse relative to hero
+  const hero = canvas.closest('.hero');
+  hero.addEventListener('mousemove', e => {
+    const rect = hero.getBoundingClientRect();
+    targetMouse.x = e.clientX - rect.left;
+    targetMouse.y = e.clientY - rect.top;
+  });
+  hero.addEventListener('mouseleave', () => {
+    targetMouse.x = -9999;
+    targetMouse.y = -9999;
+  });
+
+  function warpPoint(px, py) {
+    const dx = px - mouse.x;
+    const dy = py - mouse.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist === 0 || dist > WARP_RADIUS) return { x: px, y: py };
+    const falloff = (1 - dist / WARP_RADIUS);
+    const ease = falloff * falloff * falloff;
+    const angle = Math.atan2(dy, dx);
+    const push = ease * WARP_STRENGTH;
+    return {
+      x: px - Math.cos(angle) * push,
+      y: py - Math.sin(angle) * push
+    };
+  }
+
+  function draw() {
+    // Ease mouse
+    mouse.x += (targetMouse.x - mouse.x) * FADE_EASE;
+    mouse.y += (targetMouse.y - mouse.y) * FADE_EASE;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const offX = (W % CELL) / 2;
+    const offY = (H % CELL) / 2;
+
+    ctx.strokeStyle = 'rgba(26,25,22,0.25)';
+    ctx.lineWidth = 2;
+
+    // Vertical lines
+    for (let c = -1; c <= cols; c++) {
+      const baseX = offX + c * CELL;
+      ctx.beginPath();
+      let started = false;
+      for (let r = -1; r <= rows + 1; r++) {
+        const baseY = offY + r * CELL;
+        const p = warpPoint(baseX, baseY);
+        // Fade near edges
+        const edgeFade = Math.min(baseX / 80, (W - baseX) / 80, baseY / 80, (H - baseY) / 80, 1);
+        if (edgeFade <= 0) { started = false; continue; }
+        ctx.globalAlpha = Math.min(edgeFade, 0.7);
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let r = -1; r <= rows; r++) {
+      const baseY = offY + r * CELL;
+      ctx.beginPath();
+      let started = false;
+      for (let c = -1; c <= cols + 1; c++) {
+        const baseX = offX + c * CELL;
+        const p = warpPoint(baseX, baseY);
+        const edgeFade = Math.min(baseX / 80, (W - baseX) / 80, baseY / 80, (H - baseY) / 80, 1);
+        if (edgeFade <= 0) { started = false; continue; }
+        ctx.globalAlpha = Math.min(edgeFade, 0.7);
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
+
+// ── FAQ ACCORDION ─────────────────────────────────────────────────
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
