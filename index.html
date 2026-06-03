@@ -1,476 +1,530 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ValidateHQ — Startup Idea Evaluator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface-2: #F0EDE6;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.18);
+  --text: #1A1916;
+  --text-muted: #6B6860;
+  --text-faint: #A09E99;
+  --accent: #1A1916;
+  --accent-hover: #3A3830;
+  --green: #1D9E75;
+  --amber: #BA7517;
+  --red: #A32D2D;
+  --score-high: #1D9E75;
+  --score-mid: #BA7517;
+  --score-low: #A32D2D;
+}
 
-  :root {
-    --bg: #F7F5F0;
-    --surface: #FFFFFF;
-    --border: rgba(0,0,0,0.10);
-    --border-strong: rgba(0,0,0,0.18);
-    --text: #1A1916;
-    --text-muted: #6B6860;
-    --text-faint: #A09E99;
-    --accent: #1A1916;
-    --accent-hover: #3A3830;
-    --green: #1D9E75;
-    --amber: #BA7517;
-    --red: #A32D2D;
-    --score-high: #1D9E75;
-    --score-mid: #BA7517;
-    --score-low: #A32D2D;
-  }
+html { scroll-behavior: smooth; }
 
-  body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  #app { width: 100%; }
+#app { width: 100%; }
 
-  .landing {
-    padding: 3rem 2rem 4rem;
-    max-width: 680px;
-    margin: 0 auto;
-  }
+/* ── KEYFRAMES ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes barGrow {
+  from { width: 0; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  .logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.35rem;
-    letter-spacing: -0.01em;
-    margin-bottom: 3.5rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo-dot { width: 7px; height: 7px; background: var(--text); border-radius: 50%; display: inline-block; }
+/* ── SITE HEADER ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(247,245,240,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.site-header-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.site-header-logo img { height: 42px; width: auto; display: block; }
+.logo-fallback {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem; letter-spacing: -0.01em;
+  color: var(--text);
+  display: flex; align-items: center; gap: 7px;
+}
+.logo-dot { width: 6px; height: 6px; background: var(--text); border-radius: 50%; display: inline-block; }
 
-  .hero-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 1rem;
-  }
+.site-nav { display: flex; align-items: center; gap: 0.25rem; }
+.nav-link {
+  font-size: 13px; font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.nav-link:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
 
-  .hero-heading {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(2rem, 5vw, 2.8rem);
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    margin-bottom: 1.25rem;
-  }
+/* ── LANDING ── */
+.landing {
+  position: relative;
+  min-height: calc(100vh - 58px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 5rem 2rem 6rem;
+  overflow: hidden;
+}
 
-  .hero-sub {
-    font-size: 15px;
-    color: var(--text-muted);
-    line-height: 1.65;
-    margin-bottom: 2.5rem;
-    max-width: 480px;
-  }
+/* Warp canvas background */
+.landing-bg {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+#grid-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
 
-  .input-wrapper {
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: 14px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-  }
+.landing-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 640px;
+  text-align: center;
+}
 
-  textarea {
-    width: 100%;
-    border: none;
-    outline: none;
-    font-family: 'Outfit', sans-serif;
-    font-size: 15px;
-    color: var(--text);
-    background: transparent;
-    resize: none;
-    line-height: 1.6;
-    min-height: 120px;
-  }
-  textarea::placeholder { color: var(--text-faint); }
+.hero-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.05s ease forwards;
+}
 
-  .input-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--border);
-  }
+.hero-heading {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.18s ease forwards;
+}
+.hero-heading em { font-style: italic; color: var(--text-muted); }
 
-  .char-count { font-size: 12px; color: var(--text-faint); font-family: 'DM Mono', monospace; }
+.hero-sub {
+  font-size: 16px; color: var(--text-muted); line-height: 1.7;
+  max-width: 480px; margin: 0 auto 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.32s ease forwards;
+}
 
-  .cta-btn {
-    background: var(--text);
-    color: #FFF;
-    border: none;
-    border-radius: 9px;
-    padding: 10px 22px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .cta-btn:hover { background: var(--accent-hover); }
-  .cta-btn:active { transform: scale(0.98); }
-  .cta-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* ── INPUT CARD ── */
+.input-card {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+  opacity: 0;
+  animation: fadeUp 0.7s 0.45s ease forwards;
+  text-align: left;
+}
 
-  .hint-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-bottom: 3rem;
-  }
-  .hint-pill {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 12px;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .hint-pill:hover { border-color: var(--border-strong); color: var(--text); }
+textarea {
+  width: 100%;
+  border: none; outline: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background: transparent;
+  resize: none;
+  line-height: 1.6;
+  min-height: 120px;
+}
+textarea::placeholder { color: var(--text-faint); }
 
-  .trust-row {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-  .trust-item { font-size: 12px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; }
-  .trust-dot { width: 4px; height: 4px; background: var(--green); border-radius: 50%; }
+.input-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
 
-  .loading-state {
-    padding: 5rem 2rem;
-    text-align: center;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  .loading-orb {
-    width: 52px; height: 52px;
-    border: 2px solid var(--border);
-    border-top-color: var(--text);
-    border-radius: 50%;
-    margin: 0 auto 2rem;
-    animation: spin 0.9s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-label {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-  }
-  .loading-sub { font-size: 13px; color: var(--text-muted); }
+.char-count { font-size: 12px; color: var(--text-faint); font-family: 'DM Mono', monospace; }
 
-  .report {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 2rem 2rem 5rem;
-  }
+.cta-btn {
+  background: var(--text); color: #FFF;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 24px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: background 0.15s, transform 0.1s;
+}
+.cta-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.cta-btn:active { transform: scale(0.98); }
+.cta-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-  .report-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2.5rem;
-  }
+/* ── HINT PILLS ── */
+.hint-pills {
+  display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.58s ease forwards;
+  margin-bottom: 2rem;
+}
+.hint-pill {
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px; color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  backdrop-filter: blur(8px);
+}
+.hint-pill:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface); }
 
-  .back-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 13px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 13px;
-    color: var(--text-muted);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .back-btn:hover { border-color: var(--border-strong); color: var(--text); }
+/* ── TRUST ROW ── */
+.trust-row {
+  display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.72s ease forwards;
+}
+.trust-item { font-size: 12px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; }
+.trust-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: pulse 2.5s ease-in-out infinite; }
 
-  .report-actions { display: flex; gap: 8px; }
+/* ── ERROR BOX ── */
+.error-box {
+  background: #FEF2F2; border: 1px solid #FECACA;
+  border-radius: 12px; padding: 1rem 1.25rem;
+  font-size: 13.5px; color: #A32D2D;
+  margin-bottom: 1rem;
+  text-align: left;
+}
 
-  .print-btn {
-    background: var(--text);
-    color: #FFF;
-    border: none;
-    border-radius: 8px;
-    padding: 7px 14px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .print-btn:hover { background: var(--accent-hover); }
+/* ── LOADING ── */
+.loading-state {
+  padding: 6rem 2rem;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.loading-ring-wrap { position: relative; width: 64px; height: 64px; margin: 0 auto 2rem; }
+.loading-ring {
+  width: 64px; height: 64px;
+  border: 2px solid var(--border);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
+.loading-dot {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.loading-dot::after {
+  content: '';
+  width: 8px; height: 8px;
+  background: var(--text);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.loading-label {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem; margin-bottom: 0.6rem;
+}
+.loading-sub { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+.loading-steps {
+  margin-top: 2rem;
+  display: flex; flex-direction: column; gap: 8px;
+  text-align: left;
+  max-width: 240px;
+  margin-left: auto; margin-right: auto;
+}
+.loading-step {
+  font-size: 12px; color: var(--text-faint);
+  font-family: 'DM Mono', monospace;
+  display: flex; align-items: center; gap: 8px;
+  opacity: 0.3;
+  transition: opacity 0.4s;
+}
+.loading-step.active { opacity: 1; color: var(--text-muted); }
+.loading-step-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; flex-shrink: 0;
+}
 
-  .score-hero {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 2rem;
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
+/* ── REPORT ── */
+.report {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 2rem 5rem;
+}
 
-  .score-circle {
-    flex-shrink: 0;
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2.5px solid;
-  }
-  .score-circle .num {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    line-height: 1;
-  }
-  .score-circle .denom { font-size: 10px; color: inherit; opacity: 0.55; margin-top: 1px; }
+.report-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.5s 0.05s ease forwards;
+}
 
-  .score-high-c { border-color: var(--green); color: var(--green); }
-  .score-mid-c  { border-color: var(--amber); color: var(--amber); }
-  .score-low-c  { border-color: var(--red);   color: var(--red); }
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.back-btn:hover { border-color: var(--border-strong); color: var(--text); }
 
-  .score-meta { flex: 1; min-width: 0; }
-  .score-verdict {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.05rem;
-    line-height: 1.4;
-    margin-bottom: 0.5rem;
-  }
-  .score-summary { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+.print-btn {
+  background: var(--text); color: #FFF;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: background 0.15s;
+}
+.print-btn:hover { background: var(--accent-hover); }
 
-  .section { margin-bottom: 1.25rem; }
-  .section-title {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 0.75rem;
-    padding-left: 2px;
-  }
+/* ── SCORE HERO ── */
+.score-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  opacity: 0;
+  animation: fadeUp 0.55s 0.15s ease forwards;
+}
 
-  .rubric-grid {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-  }
+/* SVG ring score */
+.score-ring-wrap {
+  flex-shrink: 0;
+  position: relative;
+  width: 92px; height: 92px;
+}
+.score-ring-wrap svg {
+  position: absolute; inset: 0;
+  transform: rotate(-90deg);
+}
+.ring-track { fill: none; stroke: var(--surface-2); stroke-width: 6; }
+.ring-fill {
+  fill: none; stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+.ring-fill.high { stroke: var(--green); }
+.ring-fill.mid  { stroke: var(--amber); }
+.ring-fill.low  { stroke: var(--red); }
 
-  .rubric-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.85rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .rubric-row:last-child { border-bottom: none; }
+.score-ring-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.score-ring-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.8rem; line-height: 1;
+}
+.score-ring-num.high { color: var(--green); }
+.score-ring-num.mid  { color: var(--amber); }
+.score-ring-num.low  { color: var(--red); }
 
-  .rubric-label { flex: 1; font-size: 13.5px; font-weight: 500; }
-  .rubric-bar-wrap { flex: 2; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
-  .rubric-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
-  .rubric-score {
-    width: 28px; text-align: right;
-    font-family: 'DM Mono', monospace;
-    font-size: 13px; font-weight: 500;
-  }
+.score-ring-grade {
+  font-size: 9.5px; opacity: 0.55;
+  font-family: 'DM Mono', monospace;
+  margin-top: 2px;
+}
 
-  .insights-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  @media (max-width: 540px) { .insights-grid { grid-template-columns: 1fr; } }
+.score-meta { flex: 1; min-width: 0; }
+.score-verdict {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem; line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+.score-summary { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
-  .insight-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1rem;
-  }
-  .insight-card-header {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .insight-dot { width: 5px; height: 5px; border-radius: 50%; }
-  .dot-green { background: var(--green); }
-  .dot-red   { background: var(--red); }
-  .dot-amber { background: var(--amber); }
+/* ── SECTIONS ── */
+.section {
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.55s ease forwards;
+}
+.section-title {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.75rem;
+  padding-left: 2px;
+}
 
-  .insight-list { list-style: none; }
-  .insight-list li {
-    font-size: 12.5px;
-    color: var(--text-muted);
-    line-height: 1.55;
-    padding: 4px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .insight-list li:last-child { border-bottom: none; }
+/* ── RUBRIC ── */
+.rubric-grid {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+}
+.rubric-row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.rubric-row:last-child { border-bottom: none; }
+.rubric-label { flex: 1; font-size: 13.5px; font-weight: 500; }
+.rubric-bar-wrap {
+  flex: 2; height: 5px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rubric-bar {
+  height: 100%; border-radius: 3px;
+  width: 0;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.rubric-score {
+  width: 28px; text-align: right;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px; font-weight: 500;
+}
 
-  .steps-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-  .step-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .step-row:last-child { border-bottom: none; }
-  .step-num {
-    width: 22px; height: 22px;
-    background: var(--bg);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 600; color: var(--text-muted);
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .step-text { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
+/* ── INSIGHTS ── */
+.insights-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+@media (max-width: 540px) { .insights-grid { grid-template-columns: 1fr; } }
 
-  .error-box {
-    background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;
-    padding: 1rem 1.25rem; font-size: 13.5px; color: #A32D2D; margin-bottom: 1rem;
-  }
+.insight-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.insight-card-header {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 5px;
+}
+.insight-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: var(--green); }
+.dot-red   { background: var(--red); }
+.dot-amber { background: var(--amber); }
 
-  /* ── SITE HEADER ── */
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(247, 245, 240, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+.insight-list { list-style: none; }
+.insight-list li {
+  font-size: 12.5px; color: var(--text-muted);
+  line-height: 1.55;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.35s, transform 0.35s;
+}
+.insight-list li.visible { opacity: 1; transform: translateX(0); }
+.insight-list li:last-child { border-bottom: none; }
 
-  .site-header-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-  }
+/* ── STEPS ── */
+.steps-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+}
+.step-row {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.step-row.visible { opacity: 1; transform: translateY(0); }
+.step-row:last-child { border-bottom: none; }
+.step-num {
+  width: 24px; height: 24px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
 
-  .site-header-logo img {
-    height: 42px;
-    width: auto;
-    display: block;
-  }
+/* ── SURFACE-2 VAR for rubric bar ── */
+.surface-2 { background: var(--surface-2); }
 
-  /* Fallback text logo if image fails to load */
-  .site-header-logo .logo-fallback {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.15rem;
-    letter-spacing: -0.01em;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-  .site-header-logo .logo-fallback .logo-dot {
-    width: 6px; height: 6px;
-    background: var(--text);
-    border-radius: 50%;
-    display: inline-block;
-  }
+/* ── SITE FOOTER ── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 1.75rem 2rem;
+  text-align: center;
+}
+.footer-credit { font-size: 12.5px; color: var(--text-faint); margin-bottom: 0.5rem; }
+.footer-link {
+  font-size: 11.5px; color: var(--text-faint);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.footer-link:hover { color: var(--text-muted); border-color: var(--text-faint); }
 
-  .site-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .nav-link {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-decoration: none;
-    padding: 6px 14px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
-  }
-  .nav-link:hover {
-    color: var(--text);
-    border-color: var(--border);
-    background: var(--surface);
-  }
-
-  /* ── SITE FOOTER ── */
-  .site-footer {
-    border-top: 1px solid var(--border);
-    padding: 1.75rem 2rem;
-    text-align: center;
-  }
-
-  .footer-credit {
-    font-size: 12.5px;
-    color: var(--text-faint);
-    margin-bottom: 0.5rem;
-    line-height: 1.5;
-  }
-
-  .footer-link {
-    font-size: 11.5px;
-    color: var(--text-faint);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1px;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .footer-link:hover {
-    color: var(--text-muted);
-    border-color: var(--text-faint);
-  }
-
-  @media print {
-    .report-header, .back-btn, .print-btn, .site-header, .site-footer { display: none !important; }
-    body { background: #fff; }
-  }
+@media print {
+  .site-header, .site-footer, .back-btn, .print-btn, .landing-bg { display: none !important; }
+  body { background: #fff; }
+}
 </style>
 </head>
 <body>
+
 <!-- ── SITE HEADER ── -->
 <header class="site-header">
   <a href="/" class="site-header-logo">
@@ -493,11 +547,7 @@
 </footer>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
-const HF_API_TOKEN = "HF_API_TOKEN"; // ← paste your Hugging Face token
-const HF_MODEL = "HF_MODEL";
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ── CONFIG ──────────────────────────────────────────────────────────────────
 const HINTS = [
   "An AI tutor for adult learners returning to education",
   "A subscription box for rare, single-origin spices",
@@ -514,10 +564,34 @@ const RUBRIC_LABELS = {
   go_to_market_difficulty: "Go-to-market difficulty"
 };
 
+const LOADING_STEPS = [
+  "Parsing idea…",
+  "Scoring market demand…",
+  "Assessing competition…",
+  "Evaluating revenue potential…",
+  "Compiling analyst report…",
+];
+
+// ── SCORING ─────────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function calcScore(scores) {
+  // Positive signals
+  const pos = scores.market_demand + scores.revenue_potential + scores.technical_feasibility;
+  // Negative signals (inverted: high competition/gtm = harder)
+  const neg = scores.competition + scores.go_to_market_difficulty;
+  // Raw: weighted avg where positives count more, negatives subtract less
+  // Range: pos ∈ [3,30], neg ∈ [2,20]
+  // Formula gives ~50 for a perfectly average idea (all 5s)
+  const raw = (pos / 30) * 70 + ((20 - neg) / 20) * 30;
+  // Shift up by ~10 points so mediocre ideas land 45-55, not 20-30
+  return clamp(Math.round(raw + 8), 0, 100);
+}
+
 function scoreColor(n) {
-  if (n >= 65) return "score-high-c";
-  if (n >= 40) return "score-mid-c";
-  return "score-low-c";
+  if (n >= 68) return "high";
+  if (n >= 45) return "mid";
+  return "low";
 }
 function barColor(key, val) {
   if (key === "competition" || key === "go_to_market_difficulty") {
@@ -527,65 +601,89 @@ function barColor(key, val) {
 }
 function letterGrade(s) {
   if (s >= 80) return "A";
-  if (s >= 65) return "B";
-  if (s >= 50) return "C";
-  if (s >= 35) return "D";
+  if (s >= 68) return "B";
+  if (s >= 52) return "C";
+  if (s >= 38) return "D";
   return "F";
 }
 
-function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-function calcScore(scores) {
-  return clamp(
-    (scores.market_demand + scores.revenue_potential + scores.technical_feasibility
-      - scores.competition - scores.go_to_market_difficulty) * 2,
-    0, 100
-  );
-}
-
+// ── STATE ───────────────────────────────────────────────────────────────────
 let state = { view: "input", idea: "", loading: false, result: null, error: null };
 
 function render() {
   const app = document.getElementById("app");
-  if (state.view === "input") app.innerHTML = renderInput();
+  if (state.view === "input")   app.innerHTML = renderInput();
   else if (state.view === "loading") app.innerHTML = renderLoading();
-  else if (state.view === "report") app.innerHTML = renderReport();
+  else if (state.view === "report")  app.innerHTML = renderReport();
   bindEvents();
+  if (state.view === "input") initGrid();
+  if (state.view === "loading") animateLoadingSteps();
+  if (state.view === "report") animateReport();
 }
 
+// ── RENDER INPUT ─────────────────────────────────────────────────────────────
 function renderInput() {
   const len = state.idea.length;
   return `
   <div class="landing">
-    <div class="hero-label">Startup Idea Evaluator</div>
-    <h1 class="hero-heading">Is your idea<br><em>worth pursuing?</em></h1>
-    <p class="hero-sub">Paste your startup idea below. Our AI evaluation engine scores it across five dimensions and returns a structured analyst report — instantly.</p>
+    <div class="landing-bg">
+      <canvas id="grid-canvas"></canvas>
+    </div>
+    <div class="landing-inner">
+      <div class="hero-label">Startup Idea Evaluator</div>
+      <h1 class="hero-heading">Is your idea<br><em>worth pursuing?</em></h1>
+      <p class="hero-sub">Paste your startup idea below. Our AI evaluation engine scores it across five dimensions and returns a structured analyst report — instantly.</p>
 
-    <div class="input-wrapper">
-      <textarea id="idea-input" placeholder="Describe your startup idea in a sentence or two. The more specific, the better." maxlength="1200">${escHtml(state.idea)}</textarea>
-      <div class="input-footer">
-        <span class="char-count" id="cc">${len} / 1200</span>
-        <button class="cta-btn" id="analyze-btn" ${len < 10 ? "disabled" : ""}>Analyze idea →</button>
+      <div class="input-card">
+        <textarea id="idea-input" placeholder="Describe your startup idea in a sentence or two. The more specific, the better." maxlength="1200">${escHtml(state.idea)}</textarea>
+        <div class="input-footer">
+          <span class="char-count" id="cc">${len} / 1200</span>
+          <button class="cta-btn" id="analyze-btn" ${len < 10 ? "disabled" : ""}>Analyze idea →</button>
+        </div>
+      </div>
+
+      <div class="hint-pills">
+        ${HINTS.map((h,i) => `<button class="hint-pill" data-hint="${i}">Try: "${h.slice(0,42)}…"</button>`).join("")}
+      </div>
+
+      ${state.error ? `<div class="error-box">${escHtml(state.error)}</div>` : ""}
+
+      <div class="trust-row">
+        <span class="trust-item"><span class="trust-dot"></span>AI-powered rubric</span>
+        <span class="trust-item"><span class="trust-dot"></span>Five-dimension scoring</span>
+        <span class="trust-item"><span class="trust-dot"></span>Instant results</span>
       </div>
     </div>
-
-    <div class="hint-pills">
-      ${HINTS.map((h,i) => `<button class="hint-pill" data-hint="${i}">Try: "${h.slice(0,42)}…"</button>`).join("")}
-    </div>
-
-    ${state.error ? `<div class="error-box">${escHtml(state.error)}</div>` : ""}
   </div>`;
 }
 
+// ── RENDER LOADING ───────────────────────────────────────────────────────────
 function renderLoading() {
   return `
   <div class="loading-state">
-    <div class="loading-orb"></div>
+    <div class="loading-ring-wrap">
+      <div class="loading-ring"></div>
+      <div class="loading-dot"></div>
+    </div>
     <div class="loading-label">Evaluating your idea…</div>
     <p class="loading-sub">Running rubric analysis across five dimensions.<br>This takes about 10–20 seconds.</p>
+    <div class="loading-steps">
+      ${LOADING_STEPS.map((s,i) => `<div class="loading-step" id="lstep-${i}"><span class="loading-step-dot"></span>${s}</div>`).join("")}
+    </div>
   </div>`;
 }
 
+function animateLoadingSteps() {
+  LOADING_STEPS.forEach((_, i) => {
+    setTimeout(() => {
+      document.querySelectorAll('.loading-step').forEach(el => el.classList.remove('active'));
+      const el = document.getElementById(`lstep-${i}`);
+      if (el) el.classList.add('active');
+    }, i * 2800);
+  });
+}
+
+// ── RENDER REPORT ────────────────────────────────────────────────────────────
 function renderReport() {
   const r = state.result;
   const overall = r.overall_score ?? calcScore(r.scores);
@@ -593,19 +691,31 @@ function renderReport() {
   const cc = scoreColor(overall);
   const sk = Object.keys(RUBRIC_LABELS);
 
+  // SVG ring
+  const CIRC = 251.2; // 2π * 40
+  const filled = CIRC - (overall / 100) * CIRC;
+
   return `
   <div class="report">
     <div class="report-header">
       <button class="back-btn" id="back-btn">← New idea</button>
-      <div class="report-actions">
+      <div>
         <button class="print-btn" onclick="window.print()">↓ Export PDF</button>
       </div>
     </div>
 
     <div class="score-hero">
-      <div class="score-circle ${cc}">
-        <span class="num">${overall}</span>
-        <span class="denom">/ 100 · ${grade}</span>
+      <div class="score-ring-wrap">
+        <svg viewBox="0 0 92 92" xmlns="http://www.w3.org/2000/svg">
+          <circle class="ring-track" cx="46" cy="46" r="40"/>
+          <circle class="ring-fill ${cc}" id="ring-fill-el" cx="46" cy="46" r="40"
+            stroke-dasharray="${CIRC}"
+            stroke-dashoffset="${CIRC}"/>
+        </svg>
+        <div class="score-ring-inner">
+          <span class="score-ring-num ${cc}" id="score-num-display">0</span>
+          <span class="score-ring-grade">/ 100 · ${grade}</span>
+        </div>
       </div>
       <div class="score-meta">
         <div class="score-verdict">${escHtml(r.verdict)}</div>
@@ -613,7 +723,7 @@ function renderReport() {
       </div>
     </div>
 
-    <div class="section">
+    <div class="section" style="animation-delay:0.25s">
       <div class="section-title">Rubric Breakdown</div>
       <div class="rubric-grid">
         ${sk.map(key => {
@@ -622,36 +732,36 @@ function renderReport() {
           return `
           <div class="rubric-row">
             <span class="rubric-label">${RUBRIC_LABELS[key]}</span>
-            <div class="rubric-bar-wrap"><div class="rubric-bar" style="width:${val * 10}%; background:${bc};"></div></div>
+            <div class="rubric-bar-wrap"><div class="rubric-bar" data-width="${val * 10}" style="background:${bc};"></div></div>
             <span class="rubric-score" style="color:${bc}">${val}</span>
           </div>`;
         }).join("")}
       </div>
     </div>
 
-    <div class="section">
+    <div class="section" style="animation-delay:0.35s">
       <div class="section-title">Insights</div>
       <div class="insights-grid">
         <div class="insight-card">
           <div class="insight-card-header" style="color:var(--green)"><span class="insight-dot dot-green"></span>Strengths</div>
-          <ul class="insight-list">${(r.strengths||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
+          <ul class="insight-list" id="list-strengths">${(r.strengths||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
         </div>
         <div class="insight-card">
           <div class="insight-card-header" style="color:var(--red)"><span class="insight-dot dot-red"></span>Risks</div>
-          <ul class="insight-list">${(r.risks||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
+          <ul class="insight-list" id="list-risks">${(r.risks||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
         </div>
         <div class="insight-card">
           <div class="insight-card-header" style="color:var(--amber)"><span class="insight-dot dot-amber"></span>Opportunities</div>
-          <ul class="insight-list">${(r.opportunities||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
+          <ul class="insight-list" id="list-opportunities">${(r.opportunities||[]).map(s=>`<li>${escHtml(s)}</li>`).join("")}</ul>
         </div>
       </div>
     </div>
 
-    <div class="section">
+    <div class="section" style="animation-delay:0.45s">
       <div class="section-title">Validation Action Plan</div>
       <div class="steps-card">
         ${(r.validation_steps||[]).map((s,i)=>`
-        <div class="step-row">
+        <div class="step-row" id="step-${i}">
           <div class="step-num">${i+1}</div>
           <div class="step-text">${escHtml(s)}</div>
         </div>`).join("")}
@@ -660,15 +770,162 @@ function renderReport() {
   </div>`;
 }
 
-  
+function animateReport() {
+  const overall = state.result?.overall_score ?? 0;
+  const CIRC = 251.2;
+  const filled = CIRC - (overall / 100) * CIRC;
+
+  // Animate ring
+  requestAnimationFrame(() => {
+    const ring = document.getElementById('ring-fill-el');
+    if (ring) {
+      setTimeout(() => { ring.style.strokeDashoffset = filled; }, 200);
+    }
+
+    // Animate score number counting up
+    const numEl = document.getElementById('score-num-display');
+    if (numEl) {
+      let start = 0;
+      const dur = 1200;
+      const startTime = performance.now();
+      function tick(now) {
+        const t = Math.min((now - startTime) / dur, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        numEl.textContent = Math.round(ease * overall);
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      setTimeout(() => requestAnimationFrame(tick), 200);
+    }
+
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.rubric-bar').forEach(bar => {
+        const w = bar.dataset.width;
+        bar.style.width = w + '%';
+      });
+    }, 350);
+
+    // Animate insight list items
+    ['list-strengths','list-risks','list-opportunities'].forEach((id, gi) => {
+      const list = document.getElementById(id);
+      if (!list) return;
+      list.querySelectorAll('li').forEach((li, i) => {
+        setTimeout(() => li.classList.add('visible'), 500 + gi * 80 + i * 80);
+      });
+    });
+
+    // Animate step rows
+    (state.result?.validation_steps || []).forEach((_, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(`step-${i}`);
+        if (el) el.classList.add('visible');
+      }, 650 + i * 100);
+    });
+  });
+}
+
+// ── WARP GRID ────────────────────────────────────────────────────────────────
+function initGrid() {
+  const canvas = document.getElementById('grid-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const CELL = 44;
+  const WARP_RADIUS = 200;
+  const WARP_STRENGTH = 24;
+  const EASE = 0.07;
+
+  let W, H, cols, rows;
+  let mouse = { x: -9999, y: -9999 };
+  let target = { x: -9999, y: -9999 };
+
+  function resize() {
+    const hero = canvas.closest('.landing');
+    W = canvas.width = hero.offsetWidth;
+    H = canvas.height = hero.offsetHeight;
+    cols = Math.ceil(W / CELL) + 2;
+    rows = Math.ceil(H / CELL) + 2;
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  const landing = canvas.closest('.landing');
+  landing.addEventListener('mousemove', e => {
+    const rect = landing.getBoundingClientRect();
+    target.x = e.clientX - rect.left;
+    target.y = e.clientY - rect.top;
+  });
+  landing.addEventListener('mouseleave', () => { target.x = -9999; target.y = -9999; });
+
+  function warpPt(px, py) {
+    const dx = px - mouse.x, dy = py - mouse.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (!dist || dist > WARP_RADIUS) return { x: px, y: py };
+    const ease = Math.pow(1 - dist / WARP_RADIUS, 3);
+    const angle = Math.atan2(dy, dx);
+    return {
+      x: px - Math.cos(angle) * ease * WARP_STRENGTH,
+      y: py - Math.sin(angle) * ease * WARP_STRENGTH,
+    };
+  }
+
+  let running = true;
+  function draw() {
+    if (!running) return;
+    mouse.x += (target.x - mouse.x) * EASE;
+    mouse.y += (target.y - mouse.y) * EASE;
+    ctx.clearRect(0, 0, W, H);
+    const offX = (W % CELL) / 2;
+    const offY = (H % CELL) / 2;
+    ctx.strokeStyle = 'rgba(26,25,22,0.22)';
+    ctx.lineWidth = 1.5;
+
+    for (let c = -1; c <= cols; c++) {
+      const bx = offX + c * CELL;
+      ctx.beginPath(); let s = false;
+      for (let r = -1; r <= rows+1; r++) {
+        const by = offY + r * CELL;
+        const ef = Math.min(bx/80,(W-bx)/80,by/80,(H-by)/80,1);
+        if (ef <= 0) { s = false; continue; }
+        ctx.globalAlpha = Math.min(ef, 0.65);
+        const p = warpPt(bx, by);
+        if (!s) { ctx.moveTo(p.x, p.y); s = true; } else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+    for (let r = -1; r <= rows; r++) {
+      const by = offY + r * CELL;
+      ctx.beginPath(); let s = false;
+      for (let c = -1; c <= cols+1; c++) {
+        const bx = offX + c * CELL;
+        const ef = Math.min(bx/80,(W-bx)/80,by/80,(H-by)/80,1);
+        if (ef <= 0) { s = false; continue; }
+        ctx.globalAlpha = Math.min(ef, 0.65);
+        const p = warpPt(bx, by);
+        if (!s) { ctx.moveTo(p.x, p.y); s = true; } else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+  // Stop grid when navigating away
+  window._stopGrid = () => { running = false; };
+}
+
+// ── HTML ESCAPE ──────────────────────────────────────────────────────────────
 function escHtml(str) {
   if (!str) return "";
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
+// ── EVENTS ───────────────────────────────────────────────────────────────────
 function bindEvents() {
   const ta = document.getElementById("idea-input");
   if (ta) {
+    ta.focus();
     ta.addEventListener("input", () => {
       state.idea = ta.value;
       const cc = document.getElementById("cc");
@@ -683,6 +940,7 @@ function bindEvents() {
     analyze.addEventListener("click", () => {
       const idea = state.idea.trim();
       if (idea.length < 10) return;
+      if (window._stopGrid) window._stopGrid();
       runEval(idea);
     });
   }
@@ -697,10 +955,12 @@ function bindEvents() {
   });
 
   const back = document.getElementById("back-btn");
-  if (back) back.addEventListener("click", () => { state.view = "input"; state.result = null; state.error = null; render(); });
+  if (back) back.addEventListener("click", () => {
+    state.view = "input"; state.result = null; state.error = null; render();
+  });
 }
 
-
+// ── API CALL ─────────────────────────────────────────────────────────────────
 async function runEval(idea) {
   state.view = "loading";
   state.error = null;
@@ -712,19 +972,14 @@ async function runEval(idea) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idea })
     });
-
     const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || `API error ${response.status}`);
-    }
+    if (!response.ok) throw new Error(data.error || `API error ${response.status}`);
 
     data.overall_score = clamp(calcScore(data.scores), 0, 100);
 
     state.result = data;
     state.view = "report";
     render();
-
   } catch(err) {
     state.view = "input";
     state.error = "Evaluation failed: " + (err.message || "Unexpected response. Please try again.");
@@ -736,3 +991,4 @@ render();
 </script>
 </body>
 </html>
+
