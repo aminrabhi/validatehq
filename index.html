@@ -369,14 +369,128 @@
     padding: 1rem 1.25rem; font-size: 13.5px; color: #A32D2D; margin-bottom: 1rem;
   }
 
+  /* ── SITE HEADER ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(247, 245, 240, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .site-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .site-header-logo img {
+    height: 28px;
+    width: auto;
+    display: block;
+  }
+
+  /* Fallback text logo if image fails to load */
+  .site-header-logo .logo-fallback {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .site-header-logo .logo-fallback .logo-dot {
+    width: 6px; height: 6px;
+    background: var(--text);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .nav-link:hover {
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  /* ── SITE FOOTER ── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 1.75rem 2rem;
+    text-align: center;
+  }
+
+  .footer-credit {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .footer-link {
+    font-size: 11.5px;
+    color: var(--text-faint);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .footer-link:hover {
+    color: var(--text-muted);
+    border-color: var(--text-faint);
+  }
+
   @media print {
-    .report-header, .back-btn, .print-btn { display: none !important; }
+    .report-header, .back-btn, .print-btn, .site-header, .site-footer { display: none !important; }
     body { background: #fff; }
   }
 </style>
 </head>
 <body>
+<!-- ── SITE HEADER ── -->
+<header class="site-header">
+  <a href="/" class="site-header-logo">
+    <img src="logo.png" alt="ValidateHQ" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <span class="logo-fallback" style="display:none;">
+      <span class="logo-dot"></span>ValidateHQ
+    </span>
+  </a>
+  <nav class="site-nav">
+    <a href="/learn-more" class="nav-link">Learn More</a>
+  </nav>
+</header>
+
 <div id="app"></div>
+
+<!-- ── SITE FOOTER ── -->
+<footer class="site-footer">
+  <p class="footer-credit">Made with ❤ by Amin Rabhi</p>
+  <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
+</footer>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -443,7 +557,6 @@ function renderInput() {
   const len = state.idea.length;
   return `
   <div class="landing">
-    <div class="logo"><span class="logo-dot"></span>ValidateHQ</div>
     <div class="hero-label">Startup Idea Evaluator</div>
     <h1 class="hero-heading">Is your idea<br><em>worth pursuing?</em></h1>
     <p class="hero-sub">Paste your startup idea below. Our AI evaluation engine scores it across five dimensions and returns a structured analyst report — instantly.</p>
