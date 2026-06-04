@@ -536,11 +536,9 @@ function letterGrade(s) {
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function calcScore(scores) {
-  return clamp(
-    (scores.market_demand + scores.revenue_potential + scores.technical_feasibility
-      - scores.competition - scores.go_to_market_difficulty) * 2,
-    0, 100
-  );
+  const positive = (scores.market_demand + scores.revenue_potential + scores.technical_feasibility) / 3;
+  const penalty  = (scores.competition + scores.go_to_market_difficulty) / 2;
+  return clamp(Math.round(positive * 7 + (10 - penalty) * 3), 0, 100);
 }
 
 let state = { view: "input", idea: "", loading: false, result: null, error: null };
