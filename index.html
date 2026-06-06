@@ -34,7 +34,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ─── HEADER ─────────────────────────────────── */
+
 .site-header {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -67,7 +67,7 @@ body {
 }
 .nav-link:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
 
-/* ─── FOOTER ─────────────────────────────────── */
+
 .site-footer {
   border-top: 1px solid var(--border);
   padding: 1.75rem 2rem;
@@ -81,12 +81,11 @@ body {
 }
 .footer-link:hover { color: var(--text-muted); border-color: var(--text-faint); }
 
-/* ─── APP ROOT ───────────────────────────────── */
+
 #app { padding-top: 58px; }
 
-/* ═══════════════════════════════════════════════
-   LANDING / INPUT VIEW
-═══════════════════════════════════════════════ */
+
+
 .landing {
   position: relative;
   min-height: calc(100vh - 58px);
@@ -97,11 +96,11 @@ body {
   text-align: center;
 }
 
-/* Animated warp grid background */
+
 .landing-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 #grid-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* Soft vignette — only fade the very edges, keep centre grid visible */
+
 .landing-vignette {
   position: absolute; inset: 0;
   background:
@@ -116,7 +115,6 @@ body {
   margin: 0 auto;
 }
 
-/* Staggered fade-up entrance */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -151,7 +149,7 @@ body {
   max-width: 460px; margin: 0 auto 2.5rem;
 }
 
-/* ─── Input card ────────────────────────────── */
+
 .input-card {
   background: var(--surface);
   border: 1px solid var(--border-strong);
@@ -199,7 +197,7 @@ textarea::placeholder { color: var(--text-faint); }
 .cta-btn:active { transform: scale(0.98); }
 .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* ─── Hint pills ────────────────────────────── */
+
 .hint-pills {
   display: flex; flex-wrap: wrap; gap: 7px;
   justify-content: center;
@@ -219,7 +217,7 @@ textarea::placeholder { color: var(--text-faint); }
   background: #fff; transform: translateY(-1px);
 }
 
-/* ─── Trust row ─────────────────────────────── */
+
 .trust-row {
   display: flex; align-items: center; justify-content: center;
   gap: 1.5rem; flex-wrap: wrap;
@@ -228,7 +226,7 @@ textarea::placeholder { color: var(--text-faint); }
   font-size: 12px; color: var(--text-faint);
   display: flex; align-items: center; gap: 6px;
 }
-/* Pulsing green dot */
+
 .trust-pulse {
   position: relative; width: 6px; height: 6px;
   border-radius: 50%; background: var(--green); flex-shrink: 0;
@@ -245,7 +243,7 @@ textarea::placeholder { color: var(--text-faint); }
   100% { transform: scale(2.2); opacity: 0; }
 }
 
-/* Textarea hint-fill animation */
+
 @keyframes textareaFadeIn {
   from { opacity: 0.3; }
   to   { opacity: 1; }
@@ -253,10 +251,6 @@ textarea::placeholder { color: var(--text-faint); }
 textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 
 
-
-/* ═══════════════════════════════════════════════
-   LOADING VIEW
-═══════════════════════════════════════════════ */
 .loading-state {
   min-height: calc(100vh - 58px);
   display: flex; flex-direction: column;
@@ -264,7 +258,6 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
   padding: 3rem 2rem; text-align: center;
 }
 
-/* Orbiting dots loader */
 .loader-orbit {
   position: relative; width: 60px; height: 60px;
   margin: 0 auto 2rem;
@@ -288,7 +281,7 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 }
 .loading-sub { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
 
-/* Sequenced loading steps */
+
 .loading-steps {
   margin-top: 2rem; display: flex; flex-direction: column; gap: 9px;
   text-align: left; max-width: 240px;
@@ -306,9 +299,7 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 @keyframes stepIn { to { opacity: 1; } }
 .ls-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-strong); flex-shrink: 0; }
 
-/* ═══════════════════════════════════════════════
-   REPORT VIEW
-═══════════════════════════════════════════════ */
+
 .report {
   max-width: 680px;
   margin: 0 auto;
@@ -338,7 +329,7 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 }
 .print-btn:hover { background: var(--accent-hover); }
 
-/* ─── Score hero card ───────────────────────── */
+
 .score-hero {
   background: var(--surface);
   border: 1px solid var(--border-strong);
@@ -350,7 +341,7 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
   animation: fadeUp 0.55s 0.1s ease both;
 }
 
-/* SVG ring */
+
 .score-ring-wrap {
   flex-shrink: 0; position: relative;
   width: 96px; height: 96px;
@@ -393,7 +384,6 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 }
 .score-summary { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
-/* ─── Sections ──────────────────────────────── */
 .section { margin-bottom: 1.25rem; }
 .section-title {
   font-size: 10px; font-weight: 600;
@@ -401,14 +391,13 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
   color: var(--text-faint); margin-bottom: 0.75rem; padding-left: 2px;
 }
 
-/* Scroll-reveal */
+
 .s-reveal {
   opacity: 0; transform: translateY(14px);
   transition: opacity 0.55s ease, transform 0.55s ease;
 }
 .s-reveal.visible { opacity: 1; transform: none; }
 
-/* ─── Rubric grid ───────────────────────────── */
 .rubric-grid {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -438,7 +427,6 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
   font-size: 13px; font-weight: 500;
 }
 
-/* ─── Insights grid ─────────────────────────── */
 .insights-grid {
   display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px;
 }
@@ -471,7 +459,6 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 .insight-list li.li-visible { opacity: 1; transform: translateX(0); }
 .insight-list li:last-child { border-bottom: none; }
 
-/* ─── Steps card ────────────────────────────── */
 .steps-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -496,7 +483,6 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 }
 .step-text { font-size: 13.5px; line-height: 1.58; color: var(--text-muted); }
 
-/* ─── Print ─────────────────────────────────── */
 @media print {
   .report-header, .site-header, .site-footer { display: none !important; }
   body { background: #fff; }
@@ -506,7 +492,6 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="site-header">
   <a href="/" class="site-header-logo">
     <img src="logo.png" alt="ValidateHQ"
@@ -522,14 +507,14 @@ textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
 
 <div id="app"></div>
 
-<!-- FOOTER -->
+
 <footer class="site-footer">
   <p class="footer-credit">Made with ❤ by Amin Rabhi</p>
   <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
 </footer>
 
 <script>
-/* ─── Data ─────────────────────────────────────────────── */
+
 const HINTS = [
   "An AI tutor for adult learners returning to education",
   "A subscription box for rare, single-origin spices",
@@ -546,7 +531,6 @@ const RUBRIC_LABELS = {
   go_to_market_difficulty: "Go-to-market difficulty",
 };
 
-/* ─── Scoring ───────────────────────────────────────────── */
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function calcScore(scores) {
@@ -556,13 +540,11 @@ function calcScore(scores) {
   const comp = scores.competition;
   const gtm  = scores.go_to_market_difficulty;
 
-  // Weighted positive — market demand matters most
-  const pos = (md * 0.40 + rp * 0.35 + tf * 0.25); // 0–10
 
-  // Non-linear penalty: high competition/GTM hurts exponentially more
-  const pen = ((comp * comp) * 0.030 + (gtm * gtm) * 0.025); // 0–~5.5
+  const pos = (md * 0.40 + rp * 0.35 + tf * 0.25); 
 
-  // pos maps 0–10 to 0–100; pen maps 0–5.5 to 0–40
+  const pen = ((comp * comp) * 0.030 + (gtm * gtm) * 0.025); 
+
   const raw = (pos / 10) * 100 - (pen / 5.5) * 40;
 
   return clamp(Math.round(raw), 0, 100);
@@ -588,10 +570,9 @@ function barColor(key, val) {
   return val >= 7 ? "var(--green)" : val >= 4 ? "var(--amber)" : "var(--red)";
 }
 
-/* ─── State ─────────────────────────────────────────────── */
 let state = { view: "input", idea: "", result: null, error: null };
 
-/* ─── Render ────────────────────────────────────────────── */
+
 function render() {
   const app = document.getElementById("app");
   if      (state.view === "input")   app.innerHTML = renderInput();
@@ -602,7 +583,7 @@ function render() {
   if (state.view === "report") initReportAnimations();
 }
 
-/* ─── Input view ────────────────────────────────────────── */
+
 function renderInput() {
   const len = state.idea.length;
   return `
@@ -652,7 +633,7 @@ function renderInput() {
 </div>`;
 }
 
-/* ─── Loading view ──────────────────────────────────────── */
+
 function renderLoading() {
   return `
 <div class="loading-state">
@@ -671,14 +652,13 @@ function renderLoading() {
 </div>`;
 }
 
-/* ─── Report view ───────────────────────────────────────── */
+
 function renderReport() {
   const r       = state.result;
   const overall = r.overall_score ?? calcScore(r.scores);
   const grade   = letterGrade(overall);
   const color   = scoreColor(overall);
   const sk      = Object.keys(RUBRIC_LABELS);
-  // SVG ring: r=42 → circumference ≈ 264
   const dashOffset = Math.round(264 * (1 - overall / 100));
 
   return `
@@ -773,10 +753,9 @@ function renderReport() {
 </div>`;
 }
 
-/* ─── Report animations ─────────────────────────────────── */
 function initReportAnimations() {
   requestAnimationFrame(() => {
-    // Animate ring
+
     const fill = document.getElementById("sr-fill");
     const wrap = document.getElementById("ring-wrap");
     if (fill && wrap) {
@@ -785,12 +764,11 @@ function initReportAnimations() {
       }, 100);
     }
 
-    // Animate bars
     document.querySelectorAll(".rubric-bar").forEach((bar, i) => {
       setTimeout(() => { bar.style.width = bar.dataset.w + "%"; }, 180 + i * 90);
     });
 
-    // Intersection observer for sections
+
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (!e.isIntersecting) return;
@@ -809,7 +787,6 @@ function initReportAnimations() {
   });
 }
 
-/* ─── Warp grid (matches learn-more.html) ───────────────── */
 function initGrid() {
   const canvas = document.getElementById("grid-canvas");
   if (!canvas) return;
@@ -855,7 +832,7 @@ function initGrid() {
     const ox = (W % CELL) / 2, oy = (H % CELL) / 2;
     ctx.lineWidth = 1;
 
-    // Draw all grid lines (vertical + horizontal) with warp
+
     function drawLines(isVertical) {
       const outerCount = isVertical ? cols : rows;
       const innerCount = isVertical ? rows : cols;
@@ -868,7 +845,6 @@ function initGrid() {
           const px = isVertical ? baseA : baseB;
           const py = isVertical ? baseB : baseA;
           const p  = warp(px, py);
-          // Fade near canvas edges
           const ef = Math.min(px / 55, (W - px) / 55, py / 55, (H - py) / 55, 1);
           if (ef <= 0) { go = false; continue; }
           ctx.globalAlpha = Math.min(ef * 0.55, 0.55);
@@ -879,8 +855,8 @@ function initGrid() {
       }
     }
 
-    drawLines(true);   // vertical
-    drawLines(false);  // horizontal
+    drawLines(true);   
+    drawLines(true); 
 
     ctx.globalAlpha = 1;
     raf = requestAnimationFrame(draw);
@@ -888,7 +864,7 @@ function initGrid() {
   draw();
 }
 
-/* ─── Helpers ───────────────────────────────────────────── */
+
 function escHtml(str) {
   if (!str) return "";
   return String(str)
@@ -896,7 +872,7 @@ function escHtml(str) {
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-/* ─── Events ────────────────────────────────────────────── */
+
 function bindEvents() {
   const ta = document.getElementById("idea-input");
   if (ta) {
@@ -923,15 +899,13 @@ function bindEvents() {
       const text = HINTS[parseInt(p.dataset.hint)];
       state.idea = text;
 
-      // Update textarea in-place — no full re-render, no animation reset
+
       const ta  = document.getElementById("idea-input");
       const cc  = document.getElementById("cc");
       const btn = document.getElementById("analyze-btn");
 
       if (ta) {
-        // Typewriter-style: clear then fill character by character
         ta.classList.remove("hint-animating");
-        // Force reflow so animation can restart
         void ta.offsetWidth;
         ta.classList.add("hint-animating");
 
@@ -958,7 +932,7 @@ function bindEvents() {
   });
 }
 
-/* ─── API call ──────────────────────────────────────────── */
+
 async function runEval(idea) {
   state.view = "loading"; state.error = null;
   render();
