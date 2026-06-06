@@ -91,9 +91,10 @@ body {
   position: relative;
   min-height: calc(100vh - 58px);
   display: flex; flex-direction: column;
-  align-items: flex-start; justify-content: center;
+  align-items: center; justify-content: center;
   padding: 5rem 2rem 6rem;
   overflow: hidden;
+  text-align: center;
 }
 
 /* Animated warp grid background */
@@ -112,7 +113,7 @@ body {
 .landing-inner {
   position: relative; z-index: 2;
   width: 100%; max-width: 600px;
-  /* left-aligned: no margin:auto */
+  margin: 0 auto;
 }
 
 /* Staggered fade-up entrance */
@@ -132,7 +133,7 @@ body {
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--text-faint);
   margin-bottom: 1.1rem;
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .hero-label-line { width: 24px; height: 1px; background: var(--text-faint); }
 
@@ -147,7 +148,7 @@ body {
 
 .hero-sub {
   font-size: 16px; color: var(--text-muted); line-height: 1.7;
-  max-width: 460px; margin: 0 0 2.5rem 0;
+  max-width: 460px; margin: 0 auto 2.5rem;
 }
 
 /* ─── Input card ────────────────────────────── */
@@ -201,6 +202,7 @@ textarea::placeholder { color: var(--text-faint); }
 /* ─── Hint pills ────────────────────────────── */
 .hint-pills {
   display: flex; flex-wrap: wrap; gap: 7px;
+  justify-content: center;
   margin-bottom: 2.5rem;
 }
 .hint-pill {
@@ -219,7 +221,7 @@ textarea::placeholder { color: var(--text-faint); }
 
 /* ─── Trust row ─────────────────────────────── */
 .trust-row {
-  display: flex; align-items: center;
+  display: flex; align-items: center; justify-content: center;
   gap: 1.5rem; flex-wrap: wrap;
 }
 .trust-item {
@@ -243,12 +245,14 @@ textarea::placeholder { color: var(--text-faint); }
   100% { transform: scale(2.2); opacity: 0; }
 }
 
-.error-box {
-  background: #FEF2F2; border: 1px solid #FECACA;
-  border-radius: 12px; padding: 1rem 1.25rem;
-  font-size: 13.5px; color: var(--red);
-  margin-bottom: 1rem; text-align: left;
+/* Textarea hint-fill animation */
+@keyframes textareaFadeIn {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
 }
+textarea.hint-animating { animation: textareaFadeIn 0.35s ease forwards; }
+
+
 
 /* ═══════════════════════════════════════════════
    LOADING VIEW
@@ -596,7 +600,11 @@ function renderInput() {
   </div>
 
   <div class="landing-inner">
-    <p class="hero-label fu1">Startup Idea Evaluator</p>
+    <p class="hero-label fu1">
+      <span class="hero-label-line"></span>
+      Startup Idea Evaluator
+      <span class="hero-label-line"></span>
+    </p>
 
     <h1 class="hero-heading fu2">Is your idea<br><em>worth pursuing?</em></h1>
 
@@ -832,37 +840,35 @@ function initGrid() {
     mouse.y += (target.y - mouse.y) * EASE;
     ctx.clearRect(0, 0, W, H);
     const ox = (W % CELL) / 2, oy = (H % CELL) / 2;
-    ctx.strokeStyle = "rgba(26,25,22,0.22)";
-    ctx.lineWidth   = 1.5;
+    ctx.lineWidth = 1;
 
-    // Vertical lines
-    for (let c = -1; c <= cols; c++) {
-      const bx = ox + c * CELL;
-      ctx.beginPath(); let go = false;
-      for (let r = -1; r <= rows + 1; r++) {
-        const by = oy + r * CELL;
-        const p  = warp(bx, by);
-        const ef = Math.min(bx/70, (W-bx)/70, by/70, (H-by)/70, 1);
-        if (ef <= 0) { go = false; continue; }
-        ctx.globalAlpha = Math.min(ef, 0.65);
-        if (!go) { ctx.moveTo(p.x, p.y); go = true; } else ctx.lineTo(p.x, p.y);
+    // Draw all grid lines (vertical + horizontal) with warp
+    function drawLines(isVertical) {
+      const outerCount = isVertical ? cols : rows;
+      const innerCount = isVertical ? rows : cols;
+      for (let a = -1; a <= outerCount; a++) {
+        const baseA = (isVertical ? ox : oy) + a * CELL;
+        ctx.beginPath();
+        let go = false;
+        for (let b = -1; b <= innerCount + 1; b++) {
+          const baseB = (isVertical ? oy : ox) + b * CELL;
+          const px = isVertical ? baseA : baseB;
+          const py = isVertical ? baseB : baseA;
+          const p  = warp(px, py);
+          // Fade near canvas edges
+          const ef = Math.min(px / 55, (W - px) / 55, py / 55, (H - py) / 55, 1);
+          if (ef <= 0) { go = false; continue; }
+          ctx.globalAlpha = Math.min(ef * 0.55, 0.55);
+          ctx.strokeStyle = "rgba(26,25,22,0.28)";
+          if (!go) { ctx.moveTo(p.x, p.y); go = true; } else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
     }
-    // Horizontal lines
-    for (let r = -1; r <= rows; r++) {
-      const by = oy + r * CELL;
-      ctx.beginPath(); let go = false;
-      for (let c = -1; c <= cols + 1; c++) {
-        const bx = ox + c * CELL;
-        const p  = warp(bx, by);
-        const ef = Math.min(bx/70, (W-bx)/70, by/70, (H-by)/70, 1);
-        if (ef <= 0) { go = false; continue; }
-        ctx.globalAlpha = Math.min(ef, 0.65);
-        if (!go) { ctx.moveTo(p.x, p.y); go = true; } else ctx.lineTo(p.x, p.y);
-      }
-      ctx.stroke();
-    }
+
+    drawLines(true);   // vertical
+    drawLines(false);  // horizontal
+
     ctx.globalAlpha = 1;
     raf = requestAnimationFrame(draw);
   }
@@ -901,9 +907,35 @@ function bindEvents() {
 
   document.querySelectorAll(".hint-pill").forEach(p => {
     p.addEventListener("click", () => {
-      state.idea  = HINTS[parseInt(p.dataset.hint)];
-      state.error = null;
-      render();
+      const text = HINTS[parseInt(p.dataset.hint)];
+      state.idea = text;
+
+      // Update textarea in-place — no full re-render, no animation reset
+      const ta  = document.getElementById("idea-input");
+      const cc  = document.getElementById("cc");
+      const btn = document.getElementById("analyze-btn");
+
+      if (ta) {
+        // Typewriter-style: clear then fill character by character
+        ta.classList.remove("hint-animating");
+        // Force reflow so animation can restart
+        void ta.offsetWidth;
+        ta.classList.add("hint-animating");
+
+        let i = 0;
+        ta.value = "";
+        const interval = setInterval(() => {
+          ta.value += text[i];
+          i++;
+          if (cc) cc.textContent = ta.value.length + " / 1200";
+          if (i >= text.length) {
+            clearInterval(interval);
+            ta.classList.remove("hint-animating");
+          }
+        }, 18);
+      }
+
+      if (btn) btn.disabled = text.trim().length < 10;
     });
   });
 
