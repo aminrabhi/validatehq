@@ -550,9 +550,22 @@ const RUBRIC_LABELS = {
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function calcScore(scores) {
-  const positive = (scores.market_demand + scores.revenue_potential + scores.technical_feasibility) / 3;
-  const penalty  = (scores.competition + scores.go_to_market_difficulty) / 2;
-  return clamp(Math.round(positive * 7 + (10 - penalty) * 3), 0, 100);
+  const md   = scores.market_demand;
+  const rp   = scores.revenue_potential;
+  const tf   = scores.technical_feasibility;
+  const comp = scores.competition;
+  const gtm  = scores.go_to_market_difficulty;
+
+  // Weighted positive — market demand matters most
+  const pos = (md * 0.40 + rp * 0.35 + tf * 0.25); // 0–10
+
+  // Non-linear penalty: high competition/GTM hurts exponentially more
+  const pen = ((comp * comp) * 0.030 + (gtm * gtm) * 0.025); // 0–~5.5
+
+  // pos maps 0–10 to 0–100; pen maps 0–5.5 to 0–40
+  const raw = (pos / 10) * 100 - (pen / 5.5) * 40;
+
+  return clamp(Math.round(raw), 0, 100);
 }
 
 function letterGrade(s) {
